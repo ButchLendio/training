@@ -8,7 +8,6 @@ import ProductsRoutes from './routes/products';
 import UsersRoutes from './routes/users';
 import Mongoose from 'mongoose';
 
-
 //Connect to mongo
 async function Connect(){
     const connect = await Mongoose.connect(Config.mongo.url, Config.mongo.options)
@@ -20,8 +19,6 @@ async function Connect(){
 } 
 
 Connect()
-
-
 const APP = new Koa()
 
 APP.use(BodyParser());
@@ -42,4 +39,3 @@ const SERVER = APP.listen(Config.server.port, async ()=>{
 })
 
 export = SERVER 
-

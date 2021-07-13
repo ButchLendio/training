@@ -1,7 +1,7 @@
 const MONGO_SETTINGS = {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    // socketTimeoutMS: 30_000,
+    socketTimeoutMS: 30_000,
     keepAlive: true,
     poolSize: 50,
     autoIndex: false,

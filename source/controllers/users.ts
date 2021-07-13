@@ -1,4 +1,5 @@
 
+
 import Bcryptjs from 'bcryptjs';
 import Mongoose from 'mongoose';
 import Users from '../models/users';
@@ -36,6 +37,7 @@ const login = async(ctx ,next) => {
         if(users.length !==1 ){
             ctx.status = 401
             ctx.message='Unauthorized'
+
         }
 
         Bcryptjs.compare(password, users[0].password,(error, result) =>{
@@ -53,6 +55,7 @@ const login = async(ctx ,next) => {
                         ctx.message='Auth Successfu'
                         token
                         ctx.body={user:users[0]}
+
                     }
                 })
 

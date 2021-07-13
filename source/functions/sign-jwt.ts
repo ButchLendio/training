@@ -6,6 +6,7 @@ const  signJWT =  (user: IUser, callback: (error:Error | null, token:string | nu
     const timeInMilliseconds = new Date().getTime();
     const expirationTime  = timeInMilliseconds + Number(Config.token.expireTime) * 10_000;
     const expireTimeInSeconds = Math.floor(expirationTime/1_000);
+
     try {
         Jwt.sign({
             username:user.username
@@ -17,6 +18,7 @@ const  signJWT =  (user: IUser, callback: (error:Error | null, token:string | nu
         },
         (error, token) =>{
             if(error){
+
                 console.log("WEW")
                 callback(error,null)
             }

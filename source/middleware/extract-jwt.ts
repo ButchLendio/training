@@ -1,11 +1,10 @@
-
 import Jwt from 'jsonwebtoken';
 import Config from '../configs/config'
-
 
 const extractJWT = async (ctx, next) => {
 
     let token = ctx.headers.authorization?.split(' ')[1];
+
 
     if (token) {
         Jwt.verify(token, Config.token.secret,(error,decode)=>{
