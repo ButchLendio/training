@@ -1,34 +1,27 @@
-import { Request, Response, NextFunction } from 'express';
-import Logging from '../configs/logging';
+
 import Jwt from 'jsonwebtoken';
 import Config from '../configs/config'
 
-const NAMESPACE = 'Auth';
 
-const extractJWT = (req: Request, res: Response, next: NextFunction) => {
-    Logging.info(NAMESPACE, 'Validating token');
+const extractJWT = async (ctx, next) => {
 
-    let token = req.headers.authorization?.split(' ')[1];
+    let token = ctx.headers.authorization?.split(' ')[1];
 
     if (token) {
         Jwt.verify(token, Config.token.secret,(error,decode)=>{
             if(error){
-                return res.status(404).json({
-                    message: error.message,
-                    error
-                })
+                ctx.status = 404
+                ctx.body.message=error.message
+              
             }else{
-                res.locals.jwt = decode
+                ctx.locals.jwt = decode
                 next();
             }
         })
     }else{
-        return res.status(401).json({
-            message:'Unauthorized'
-        })
+        ctx.status = 401
+        ctx.body='Unauthorized'
     }
-    return res.status(200).json({
-        message: 'Authorized'
-    });
+    ctx.status = 200
 };
 export default extractJWT

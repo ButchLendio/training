@@ -1,10 +1,13 @@
-import Express from 'express';
+// import Express from 'express';
+import Router from 'koa-router'
+
 import Controller from '../controllers/products';
 
-const ROUTER = Express.Router();
+const router = new Router();
 
-ROUTER.post('/post', Controller.addProducts);
+// ROUTER.post('/products', Controller.addProducts);
 
-ROUTER.get('/get', Controller.getAllProducts);
+router.get('/products', Controller.getAllProducts);
 
-export = ROUTER;
+export = router;
+ 

@@ -1,85 +1,57 @@
-import { Request, Response, NextFunction } from 'express';
-import Logging from '../configs/logging';
-import Bcryptjs, { hash } from 'bcryptjs';
+
+import Bcryptjs from 'bcryptjs';
 import Mongoose from 'mongoose';
 import Users from '../models/users';
-import SignJwt from '../functions/sign-JWT'
+import SignJwt from '../functions/sign-jwt';
 
+const addUser = async(ctx ,next) => {
+    let { username, password } = ctx.request.body;
 
+    const user = new Users({
+        _id: new Mongoose.Types.ObjectId(),
+        username,
+        password: await Bcryptjs.hash(password, 10)
+    })
 
+    const find = await Users.find({username})  
 
-const NAMESPACE = 'User';
-const validateToken = (req: Request, res: Response, next: NextFunction) => {
-    Logging.info(NAMESPACE, 'Token validated');
-
-    return res.status(200).json({
-        message: 'Authorized'
-    });
+    if(find.length!=0){
+        ctx.status = 400
+        ctx.body='User already exist'
+    }else{
+        const res = await user.save()
+    
+        ctx.status=200
+        ctx.body={res}
+    }
+ 
 };
 
-const addUser = (req: Request, res: Response, next: NextFunction) => {
-    let { username, password } = req.body;
+const login = async(ctx ,next) => {
+    let {username, password} = ctx.body;
 
-    Bcryptjs.hash(password, 10, (hashError, hash) => {
-        if (hashError) {
-            return res.status(500).json({
-                message: hashError.message,
-                error: hashError
-            });
-        }
-
-        //insert user to DB
-        const user = new Users({
-            _id: new Mongoose.Types.ObjectId(),
-            username,
-            password:hash
-        })
-
-        return user.save()
-        .then(user => {
-            return res.status(201).json({
-                user
-            })
-        })
-        .catch(error => {
-            return res.status(500).json({
-                message:error.message,
-                error
-            }) 
-        })
-    });
-};
-
-const login = (req: Request, res: Response, next: NextFunction) => {
-    let {username, password} = req.body;
-
-    Users.find({username})
-    .exec()
+    await Users.find({username})
     .then((users) => {
         if(users.length !==1 ){
-            return res.status(401).json({
-                message:'Unauthorized'
-            })
+            ctx.status = 401
+            ctx.message='Unauthorized'
         }
 
         Bcryptjs.compare(password, users[0].password,(error, result) =>{
             if(error){
-                return res.status(401).json({
-                    message:'Unauthorized'
-                })
+                 ctx.status= 401
+                 ctx.message='Unauthorized'
+                
             }else if(result){
                 SignJwt(users[0],(_error, token) => {
                     if(_error){
-                        return res.status(401).json({
-                            message:'Unauthorized',
-                            error:_error
-                        })
+                        ctx.status= 401
+                        ctx.message='Unauthorized'
                     }else if(token){
-                        return res.status(200).json({
-                            message:'Auth Successful',
-                            token,
-                            user:users[0]
-                        })
+                        ctx.status= 200
+                        ctx.message='Auth Successfu'
+                        token
+                        ctx.body={user:users[0]}
                     }
                 })
 
@@ -88,15 +60,11 @@ const login = (req: Request, res: Response, next: NextFunction) => {
         })
     })
     .catch(error => {
-        return res.status(500).json({
-            message:error.message,
-            error
-        }) 
+        ctx.status= 500
+        ctx.message=error.message
+        error
     })
-
-
 };
 
-const getAllUsers = (req: Request, res: Response, next: NextFunction) => {};
 
-export default { validateToken, addUser, login, getAllUsers };
+export default { addUser,login };
