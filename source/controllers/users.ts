@@ -4,6 +4,7 @@ import Mongoose from 'mongoose';
 import Users from '../models/users';
 import SignJwt from '../functions/sign-jwt';
 
+
 const addUser = async(ctx ,next) => {
     let { username, password } = ctx.request.body;
 
