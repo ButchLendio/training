@@ -2,7 +2,8 @@ import Http from 'http';
 import Express from 'express';
 import Logging from './configs/logging';
 import Config from './configs/config';
-import ProductsRoutes from './routes/product';
+import ProductsRoutes from './routes/products';
+import UsersRoutes from './routes/users';
 import Mongoose from 'mongoose';
 
 const NAMESPACE = 'Server';
@@ -47,6 +48,8 @@ ROUTER.use((req, res, next) => {
 
 //routes
 ROUTER.use('/api/products', ProductsRoutes);
+
+ROUTER.use('/api/users', UsersRoutes);
 
 //Error Handling
 ROUTER.use((req, res, next) => {
