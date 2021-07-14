@@ -18,12 +18,9 @@ const  signJWT =  (user: IUser, callback: (error:Error | null, token:string | nu
         },
         (error, token) =>{
             if(error){
-
-                console.log("WEW")
                 callback(error,null)
             }
             else if(token){
-                console.log("WOW")
                 callback(null,token)
             }
         })

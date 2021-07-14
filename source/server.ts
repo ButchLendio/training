@@ -8,17 +8,16 @@ import ProductsRoutes from './routes/products';
 import UsersRoutes from './routes/users';
 import Mongoose from 'mongoose';
 
+const DB_URL = "http://localhost:50001/testing"
 //Connect to mongo
+
+Config.mongo.connectWithRetry()
+
 async function Connect(){
-    const connect = await Mongoose.connect(Config.mongo.url, Config.mongo.options)
-    if(connect){
-        console.log("Connected to mongoDB!")
-    }else{
-        throw new Error("Error")
-    }
+   const connect= Config.mongo.connectWithRetry()
+   return connect
 } 
 
-Connect()
 const APP = new Koa()
 
 APP.use(BodyParser());
@@ -35,6 +34,7 @@ APP.use(UsersRoutes.routes());
 
 
 const SERVER = APP.listen(Config.server.port, async ()=>{
+    await Connect()
     console.log(`Server running on ${Config.server.hostname}:${Config.server.port}`)
 })
 
