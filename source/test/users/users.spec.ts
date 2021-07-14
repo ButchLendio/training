@@ -23,6 +23,21 @@ describe("Users Test", ()=>{
         presentUsername=randomUsername
         presentPassword=randomPassword
         await Request(Server).post("/users")
+        .send({username:"Butch",password:"1234"})
+        
+        .then(async res =>{
+            const freshAddedUser = await Users.count({username:res.body.username}).exec()
+
+            Expect(res.status).to.equal(201)
+            Expect(freshAddedUser).to.equal(1)
+        })
+        .catch(error => error)
+    })
+
+    it("Add new user - POST/users", async() =>{
+        presentUsername=randomUsername
+        presentPassword=randomPassword
+        await Request(Server).post("/users")
         .send({username:randomUsername,password:randomPassword})
         
         .then(async res =>{
