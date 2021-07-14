@@ -1,5 +1,3 @@
-
-
 import Bcryptjs from 'bcryptjs';
 import Users from '../models/users';
 import Config from '../configs/config'

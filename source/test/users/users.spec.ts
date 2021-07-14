@@ -3,10 +3,9 @@ import {expect} from 'chai'
 import {internet} from "faker"
 import Server from '../../server'
 import Users from "../../models/users"
-import console from 'console';
 
 afterEach(() => {
-    Users.deleteMany({name:randomUsername}).exec()
+    Users.deleteMany({username:randomUsername}).exec()
 })
 let randomUsername,
     randomPassword,
