@@ -1,16 +1,12 @@
-import Express from 'express';
+import Router from 'koa-router'
 import Controller from '../controllers/users';
+import ExtractJWT from '../middleware/extract-jwt';
 
-const ROUTER = Express.Router();
+const router = new Router();
 
-// ROUTER.post('/post', Controller.addProducts);
+router.post('/users', Controller.addUser);
 
-ROUTER.get('/validate', Controller.validateToken);
+router.post('/auth', Controller.login);
 
-ROUTER.post('/register', Controller.addUser);
+export = router;
 
-ROUTER.post('/login', Controller.login);
-
-ROUTER.get('/get', Controller.getAllUsers);
-
-export = ROUTER;

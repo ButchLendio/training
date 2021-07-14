@@ -1,24 +1,41 @@
-const MONGO_SETTINGS = {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    socketTimeoutMS: 30_000,
-    keepAlive: true,
-    poolSize: 50,
-    autoIndex: false,
-    retryWrites: false
-};
+import mongoose from 'mongoose';
+import debug from 'debug';
 
-const MONGO_USERNAME = process.env.MONGO_USERNAME || 'admin';
-const MONGO_PASSWORD = process.env.MONGO_PASSWORD || 'admin';
-const MONGO_DB = process.env.MONGO_DB || 'Testing';
-const MONGO_HOST = process.env.MONGO_URL || `testing.sgatu.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority`;
+const log: debug.IDebugger = debug('app:mongoose-service');
 
-const MONGO = {
-    host: MONGO_HOST,
-    username: MONGO_USERNAME,
-    password: MONGO_PASSWORD,
-    options: MONGO_SETTINGS,
-    url: `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
-};
+class MongooseService {
+     count = 0;
+     mongooseOptions = {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 5000,
+        useFindAndModify: false,
+    };
 
-export default MONGO;
+    constructor() {
+        this.connectWithRetry();
+    }
+
+    getMongoose() {
+        return mongoose;
+    }
+
+    connectWithRetry = () => {
+        log('Attempting MongoDB connection (will retry if needed)');
+        mongoose
+            .connect(process.env.MONGODB_URI || 'mongodb://localhost:50001/testing', this.mongooseOptions)
+            .then(() => {
+                console.log('MongoDB is connected');
+            })
+            .catch((err) => {
+                const retrySeconds = 5;
+                console.log(
+                    `MongoDB connection unsuccessful (will retry #${++this
+                        .count} after ${retrySeconds} seconds):`,
+                    err
+                );
+                setTimeout(this.connectWithRetry, retrySeconds * 1000);
+            });
+    };
+}
+export default  new MongooseService();

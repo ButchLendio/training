@@ -1,102 +1,76 @@
-import { Request, Response, NextFunction } from 'express';
-import Logging from '../configs/logging';
-import Bcryptjs, { hash } from 'bcryptjs';
-import Mongoose from 'mongoose';
+
+
+import Bcryptjs from 'bcryptjs';
 import Users from '../models/users';
-import SignJwt from '../functions/sign-JWT'
+import SignJwt from '../functions/sign-jwt';
+import Config from '../configs/config'
+import Jwt from 'jsonwebtoken'
 
 
 
 
-const NAMESPACE = 'User';
-const validateToken = (req: Request, res: Response, next: NextFunction) => {
-    Logging.info(NAMESPACE, 'Token validated');
+const addUser = async(ctx ,next) => {
+    let { username, password } = ctx.request.body;
 
-    return res.status(200).json({
-        message: 'Authorized'
-    });
-};
+    const user = new Users({
+        username,
+        password: await Bcryptjs.hash(password, 10)
+    })
 
-const addUser = (req: Request, res: Response, next: NextFunction) => {
-    let { username, password } = req.body;
+    const find = await Users.exists({username})  
 
-    Bcryptjs.hash(password, 10, (hashError, hash) => {
-        if (hashError) {
-            return res.status(500).json({
-                message: hashError.message,
-                error: hashError
-            });
+    if(find){
+        ctx.status = 400
+        ctx.body='User already exist'
+    }else{
+        const res = await user.save()
+    
+        ctx.status=200
+        ctx.body={res}
+    }
+}
+
+const login = async(ctx ,next) => {
+    let {username, password} = ctx.request.body;
+
+    try {
+        const user = await Users.findOne({username})
+
+        if(!user){
+            ctx.status = 400
+            throw new Error("Not found")
         }
 
-        //insert user to DB
-        const user = new Users({
-            _id: new Mongoose.Types.ObjectId(),
-            username,
-            password:hash
-        })
+        const Bcrypt = await Bcryptjs.compare(password, user.password)
+        if(Bcrypt){
+            const timeInMilliseconds = new Date().getTime();
+            const expirationTime  = timeInMilliseconds + Number(Config.token.expireTime) * 10_000;
+            const expireTimeInSeconds = Math.floor(expirationTime/1_000);
 
-        return user.save()
-        .then(user => {
-            return res.status(201).json({
-                user
-            })
-        })
-        .catch(error => {
-            return res.status(500).json({
-                message:error.message,
-                error
-            }) 
-        })
-    });
-};
-
-const login = (req: Request, res: Response, next: NextFunction) => {
-    let {username, password} = req.body;
-
-    Users.find({username})
-    .exec()
-    .then((users) => {
-        if(users.length !==1 ){
-            return res.status(401).json({
-                message:'Unauthorized'
-            })
-        }
-
-        Bcryptjs.compare(password, users[0].password,(error, result) =>{
-            if(error){
-                return res.status(401).json({
-                    message:'Unauthorized'
-                })
-            }else if(result){
-                SignJwt(users[0],(_error, token) => {
-                    if(_error){
-                        return res.status(401).json({
-                            message:'Unauthorized',
-                            error:_error
-                        })
-                    }else if(token){
-                        return res.status(200).json({
-                            message:'Auth Successful',
-                            token,
-                            user:users[0]
-                        })
-                    }
-                })
-
+            const token = await Jwt.sign({
+                username:user.username
+            },Config.token.secret ,
+            {
+                issuer:Config.token.issUser,
+                algorithm: 'HS256',
+                expiresIn: expireTimeInSeconds
             }
-             
-        })
-    })
-    .catch(error => {
-        return res.status(500).json({
-            message:error.message,
-            error
-        }) 
-    })
-
-
+            )
+            ctx.status= 200
+            ctx.message='Auth Successful'
+            ctx.body={user,token}
+        }else{
+            ctx.status= 401
+            ctx.message='Unauthorized'
+        }
+        
+    } catch (error) {
+        ctx.status= 500
+        ctx.message=error.message
+        error
+    }
 };
 
-const getAllUsers = (req: Request, res: Response, next: NextFunction) => {};
 
-export default { validateToken, addUser, login, getAllUsers };
+
+export default { addUser,login }
