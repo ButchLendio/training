@@ -1,52 +1,51 @@
-import  Request  from 'supertest';
-import {expect} from 'chai'
-import {commerce,finance} from "faker"
-import Server from '../../server'
-import Products from "../../models/products"
+import Request from 'supertest';
+import { expect } from 'chai';
+import { commerce, finance } from 'faker';
+import Server from '../../server';
+import Products from '../../models/products';
 
 afterEach(() => {
-    Products.deleteMany({name:randomItem}).exec()
-})
-let randomItem,
-    randomAmount,
-    presentItem,
-    presentAmount,
-    token
+    Products.deleteMany({ name: randomItem }).exec();
+});
+let randomItem, randomAmount, presentItem, presentAmount, token, id;
 
-describe("Product Test", ()=>{
-    
-    before(()=>{
-        randomItem=commerce.productName()
-        randomAmount=finance.amount()
-    })
-    it("Login - POST/auth", async() =>{
-        const res = await Request(Server).post("/auth")
-        .send({username:"Butch",password:"1234"})
-        token=res.body.token
-         expect(res.status).to.equal(200)  
-    })
+describe('Product Test', () => {
+    before(() => {
+        randomItem = commerce.productName();
+        randomAmount = finance.amount();
+    });
+    it('Login - POST/auth', async () => {
+        const res = await Request(Server)
+            .post('/auth')
+            .send({ username: 'Butch', password: '1234' });
+        token = res.body.token;
+        id = res.body.user._id;
+        expect(res.status).to.equal(200);
+    });
 
-    it("Add product - POST/products", async() =>{
-        presentItem = randomItem
-        presentAmount = randomAmount
-        const res = await Request(Server).post("/products")
-        .send({name:randomItem,price:randomAmount})
-        .set({ Authorization:`Bearer ${token}`})
-         expect(res.status).to.equal(200)  
-    })
+    it('Add product - POST/products', async () => {
+        presentItem = randomItem;
+        presentAmount = randomAmount;
 
+        const res = await Request(Server)
+            .post('/products')
+            .send({ name: randomItem, price: randomAmount, createdBy: id })
+            .set({ Authorization: `Bearer ${token}` });
 
-    it("With out token - POST/products", async() =>{
-        const res = await Request(Server).post("/products")
-        .send({name:randomItem,price:randomAmount})
-         expect(res.status).to.equal(400)  
-    })
+        expect(res.status).to.equal(200);
+    });
 
-    it("Product already exist- POST/products", async() =>{
-        const res = await Request(Server).post("/products")
-        .send({name:presentItem,price:presentAmount})
-        .set({ Authorization:`Bearer ${token}`})
-         expect(res.status).to.equal(200)  
-    })
+    it('With out token - POST/products', async () => {
+        const res = await Request(Server)
+            .post('/products')
+            .send({ name: randomItem, price: randomAmount, createdBy: id });
+        expect(res.status).to.equal(400);
+    });
 
-})
+    it('Product already exist- POST/products', async () => {
+        const res = await Request(Server)
+            .post('/products')
+            .send({ name: presentItem, price: presentAmount , createdBy: id })
+        expect(res.status).to.equal(400);
+    });
+});

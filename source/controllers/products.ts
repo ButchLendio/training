@@ -2,11 +2,12 @@ import Products from '../models/products';
 
 const addProducts = async(ctx,next) =>{
     try {
-    let { name, price } = ctx.request.body;
+    let { name, price ,createdBy} = ctx.request.body;
 
     const product = new Products({
         name,
-        price
+        price,
+        createdBy
     })
 
     const find = await Products.exists({name})  
