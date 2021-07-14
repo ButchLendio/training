@@ -1,26 +1,37 @@
 import Jwt from 'jsonwebtoken';
+import { Context } from 'koa';
 import Config from '../configs/config'
 
-const extractJWT = async (ctx, next) => {
 
-    let token = ctx.headers.authorization?.split(' ')[1];
+async function  verifyToken(
+  ctx: Context,
+  next
+) {
+
+  const bearer = ctx.get('Authorization').split(' ');
+
+  let allowed = true;
+  let decoded;
+
+  const token = bearer[1];
+
+  if (bearer[0] !== 'Bearer') {
+    allowed = false;
+  }
+
+  if (!token) {
+    allowed = false;
+  }
+  try {
+    decoded = Jwt.verify(token, Config.token.secret);
+  } catch (e) {
+    ctx.status=400
+    ctx.body='Wrong Token'
+    allowed = false;
+    return
+  }
+await next()  
+}
 
 
-    if (token) {
-        Jwt.verify(token, Config.token.secret,(error,decode)=>{
-            if(error){
-                ctx.status = 404
-                ctx.body.message=error.message
-              
-            }else{
-                ctx.locals.jwt = decode
-                next();
-            }
-        })
-    }else{
-        ctx.status = 401
-        ctx.body='Unauthorized'
-    }
-    ctx.status = 200
-};
-export default extractJWT
+export default verifyToken ;

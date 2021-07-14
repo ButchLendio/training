@@ -2,12 +2,8 @@
 
 import Bcryptjs from 'bcryptjs';
 import Users from '../models/users';
-import SignJwt from '../functions/sign-jwt';
 import Config from '../configs/config'
 import Jwt from 'jsonwebtoken'
-
-
-
 
 const addUser = async(ctx ,next) => {
     let { username, password } = ctx.request.body;
@@ -48,7 +44,8 @@ const login = async(ctx ,next) => {
             const expireTimeInSeconds = Math.floor(expirationTime/1_000);
 
             const token = await Jwt.sign({
-                username:user.username
+                username:user.username,
+                password:user.password
             },Config.token.secret ,
             {
                 issuer:Config.token.issUser,

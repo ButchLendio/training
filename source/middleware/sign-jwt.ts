@@ -9,7 +9,8 @@ const  signJWT = async(user: IUser, callback: (error:Error | null, token:string 
 
     try {
         Jwt.sign({
-            username:user.username
+            username:user.username,
+            password:user.password
         },Config.token.secret ,
         {
             issuer:Config.token.issUser,
