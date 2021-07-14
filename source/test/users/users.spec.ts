@@ -13,15 +13,11 @@ let randomUsername,
     presentPassword
 
 describe("Users Test", ()=>{
-
     
     before(()=>{
         randomUsername=internet.userName();
         randomPassword = internet.password();
     })
-
-    // const presentUsername = randomUsername
-    // const presentPassword = randomPassword
 
     it("Add new user - POST/users", async() =>{
         presentUsername=randomUsername
@@ -38,16 +34,12 @@ describe("Users Test", ()=>{
         .catch(error => error)
     })
 
-    // it("User already exist - POST/users", async() =>{
-    //     console.log(randomUsername,randomPassword)
-    //     console.log(presentUsername,presentPassword)
-
-    //     await Request(Server).post("/users")
-    //     .send({username:presentUsername,password:presentPassword})
-    //     .then(async res =>{
-    //         console.log(res.status)
-    //         Expect(res.status).to.equal(23466)
-    //     })
-    //     .catch(error => error)
-    // })
+    it("User already exist - POST/users", async() =>{
+        await Request(Server).post("/users")
+        .send({username:presentUsername,password:presentPassword})
+        .then(async res =>{
+            Expect(res.status).to.equal(400)
+        })
+        .catch(error => error)
+    })
 })
