@@ -27,6 +27,54 @@ afterEach(async function() {
          expect(res.status).to.equal(200)  
     })
 
+    it("Add user - POST/auth", async function (){
+        const user = {
+            name: internet.userName(),
+            username: internet.userName(),
+            password: internet.password(),
+          };
+        const res = await Request(Server).post("/users")
+        .send({name:user.name})
+        .auth(user.username,user.password)
+         expect(res.status).to.equal(200)  
+    })
+
+    it("Name require - POST/auth", async function (){
+        const user = {
+            name: internet.userName(),
+            username: internet.userName(),
+            password: internet.password(),
+          };
+        const res = await Request(Server).post("/users")
+        .send({name:''})
+        .auth(user.username,user.password)
+         expect(res.status).to.equal(400)  
+    })
+
+    it("Username require - POST/auth", async function (){
+        const user = {
+            name: internet.userName(),
+            username: internet.userName(),
+            password: internet.password(),
+          };
+        const res = await Request(Server).post("/users")
+        .send({name:user.name})
+        .auth('',user.password)
+         expect(res.status).to.equal(400)  
+    })
+
+    it("Password require - POST/auth", async function (){
+        const user = {
+            name: internet.userName(),
+            username: internet.userName(),
+            password: internet.password(),
+          };
+        const res = await Request(Server).post("/users")
+        .send({name:user.name})
+        .auth(user.username,'')
+         expect(res.status).to.equal(400)  
+    })
+
 
 })
 

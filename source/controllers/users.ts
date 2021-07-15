@@ -5,11 +5,27 @@ import Jwt from 'jsonwebtoken';
 
 import Auth from 'basic-auth';
 
-const addUser = async (ctx, next) => {
+export const addUser = async (ctx, next) => {
     const authCredentials = Auth(ctx);
     const { name } = ctx.request.body;
     const username = authCredentials.name;
     const password = authCredentials.pass;
+    
+    if(!name){
+        ctx.status= 400
+        ctx.message='Name require'
+        return
+    }
+    if(!username){
+        ctx.status= 400
+        ctx.message='Username require'
+        return
+    }
+    if(!password){
+        ctx.status= 400
+        ctx.message='Password require'
+        return
+    }
 
     const user = new Users({
         name,
@@ -23,13 +39,13 @@ const addUser = async (ctx, next) => {
         ctx.status = 400;
         ctx.body = 'User already exist';
     } else {
-        const res = await Users.create({user});
+        const res = await Users.create(user);
         ctx.status = 200;
         ctx.body = { res };
     }
 };
 
-const login = async (ctx, next) => {
+export const login = async (ctx, next) => {
     const authCredentials = Auth(ctx);
     
     const username = authCredentials.name;
@@ -69,5 +85,3 @@ const login = async (ctx, next) => {
         ctx.message = 'Unauthorized';
     }
 };
-
-export default { addUser, login };
