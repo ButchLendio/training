@@ -11,21 +11,6 @@ const addUser = async(ctx) => {
     const username = authCredentials.name
     const password = authCredentials.pass
 
-        if(!name){
-            ctx.status= 400
-            ctx.message='Username require'
-            return
-        }
-        if(!username){
-            ctx.status= 400
-            ctx.message='Username require'
-            return
-        }
-        if(!password){
-            ctx.status= 400
-            ctx.message='Password require'
-            return
-        }
 
     const user = new Users({
         name,
