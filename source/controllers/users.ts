@@ -42,9 +42,9 @@ const login = async (ctx, next) => {
         return;
     }
 
-    const ifMatch = await Bcryptjs.compare(password, user.password);
-    
-    if (ifMatch) {
+    const passwordIsValid = await Bcryptjs.compare(password, user.password);
+
+    if (passwordIsValid) {
         const timeInMilliseconds = new Date().getTime();
         const expirationTime = timeInMilliseconds + Number(Config.token.expireTime) * 10_000;
         const expireTimeInSeconds = Math.floor(expirationTime / 1_000);

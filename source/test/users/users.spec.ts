@@ -5,7 +5,7 @@ import Server from '../../server'
 import Users from "../../models/users"
 import Bcryptjs from 'bcryptjs';
 
-describe.only("Users Test", ()=>{
+describe("Users Test", ()=>{
     
 afterEach(async function() {
        await Users.deleteMany({})
