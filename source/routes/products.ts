@@ -1,8 +1,9 @@
 import Router from 'koa-router'
-import {getAllProducts} from '../controllers/products';
+import Controller from '../controllers/products';
 
 const router = new Router();
-router.get('/products', getAllProducts);
+
+router.get('/products', Controller.getAllProducts);
 
 export = router;
  
