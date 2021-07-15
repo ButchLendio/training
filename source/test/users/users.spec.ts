@@ -37,8 +37,6 @@ describe("Users Test", ()=>{
     })
 
     it("Without token - POST/users", async() =>{
-        presentUsername=randomUsername
-        presentPassword=randomPassword
         const res = await Request(Server).post("/users")
         .send({username:randomUsername,password:randomPassword})
         expect(res.status).to.equal(400)
