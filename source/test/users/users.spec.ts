@@ -3,28 +3,31 @@ import {expect} from 'chai'
 import {internet} from "faker"
 import Server from '../../server'
 import Users from "../../models/users"
+import Bcryptjs from 'bcryptjs';
 
-afterEach(() => {
-    Users.deleteMany({username:randomUsername}).exec()
-})
-let randomUsername,
-    randomPassword,
-    presentUsername,
-    presentPassword,
-    token
-
-describe("Users Test", ()=>{
+describe.only("Users Test", ()=>{
     
-    before(()=>{
-        randomUsername=internet.userName();
-        randomPassword = internet.password();
+afterEach(async function() {
+       await Users.deleteMany({})
     })
 
-    it("Login - POST/auth", async() =>{
+    it("Login - POST/auth", async function (){
+        const user = {
+            name: internet.userName(),
+            username: internet.userName(),
+            password: internet.password(),
+          };
+        await Users.create({
+            ...user,
+            password:await Bcryptjs.hash(user.password,10)
+        })
+
         const res = await Request(Server).post("/auth")
-        .send({username:"Butch",password:"1234"})
-        token=res.body.token
+        .auth(user.username,user.password)
          expect(res.status).to.equal(200)  
     })
 
+
 })
+
+

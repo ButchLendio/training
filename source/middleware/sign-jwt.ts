@@ -7,7 +7,6 @@ const  signJWT = async(user: IUser, callback: (error:Error | null, token:string 
     const expirationTime  = timeInMilliseconds + Number(Config.token.expireTime) * 10_000;
     const expireTimeInSeconds = Math.floor(expirationTime/1_000);
 
-    try {
         Jwt.sign({
             username:user.username,
             password:user.password
@@ -25,10 +24,7 @@ const  signJWT = async(user: IUser, callback: (error:Error | null, token:string 
                 callback(null,token)
             }
         })
-    } catch (error) {
-    callback(error,null)
     }
-}
 
 export default signJWT
  
