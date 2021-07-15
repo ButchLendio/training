@@ -31,7 +31,6 @@ describe('Product Test', () => {
             .post('/products')
             .send({ name: randomItem, price: randomAmount, createdBy: id })
             .set({ Authorization: `Bearer ${token}` });
-
         expect(res.status).to.equal(200);
     });
 
@@ -46,6 +45,30 @@ describe('Product Test', () => {
         const res = await Request(Server)
             .post('/products')
             .send({ name: presentItem, price: presentAmount , createdBy: id })
+        expect(res.status).to.equal(400);
+    });
+
+    it('Name require - POST/products', async () => {
+        const res = await Request(Server)
+            .post('/products')
+            .send({ price: presentAmount , createdBy: id })
+            .set({ Authorization: `Bearer ${token}` });
+        expect(res.status).to.equal(400);
+    });
+
+    it('Price require - POST/products', async () => {
+        const res = await Request(Server)
+            .post('/products')
+            .send({ name: presentItem, createdBy: id })
+            .set({ Authorization: `Bearer ${token}` });
+        expect(res.status).to.equal(400);
+    });
+
+    it('Owner require - POST/products', async () => {
+        const res = await Request(Server)
+            .post('/products')
+            .send({ name: presentItem, price: presentAmount})
+            .set({ Authorization: `Bearer ${token}` });
         expect(res.status).to.equal(400);
     });
 });

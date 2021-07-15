@@ -10,6 +10,22 @@ const addProducts = async(ctx,next) =>{
         createdBy
     })
 
+    if(!name){
+        ctx.status= 400
+        ctx.message='Name require'
+        return
+    }
+    if(!price){
+        ctx.status= 400
+        ctx.message='Price require'
+        return
+    }
+    if(!createdBy){
+        ctx.status= 400
+        ctx.message='Owner require'
+        return
+    }
+
     const find = await Products.exists({name})  
 
     if(find){

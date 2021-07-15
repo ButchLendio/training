@@ -6,6 +6,17 @@ import Jwt from 'jsonwebtoken'
 const addUser = async(ctx ,next) => {
     let { username, password } = ctx.request.body;
 
+        if(!username){
+            ctx.status= 400
+            ctx.message='Username require'
+            return
+        }
+        if(!password){
+            ctx.status= 400
+            ctx.message='Password require'
+            return
+        }
+
     const user = new Users({
         username,
         password: await Bcryptjs.hash(password, 10)
@@ -28,7 +39,19 @@ const login = async(ctx ,next) => {
     let {username, password} = ctx.request.body;
 
     try {
+        
         const user = await Users.findOne({username})
+
+        if(!username){
+            ctx.status= 400
+            ctx.message='Username require'
+            return
+        }
+        if(!password){
+            ctx.status= 400
+            ctx.message='Password require'
+            return
+        }
 
         if(!user){
             ctx.status = 400

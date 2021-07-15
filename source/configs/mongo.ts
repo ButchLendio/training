@@ -20,7 +20,7 @@ class MongooseService {
         return mongoose;
     }
 
-    connectWithRetry = () => {
+    async connectWithRetry(){
         log('Attempting MongoDB connection (will retry if needed)');
         mongoose
             .connect(process.env.MONGODB_URI || 'mongodb://localhost:50001/testing', this.mongooseOptions)

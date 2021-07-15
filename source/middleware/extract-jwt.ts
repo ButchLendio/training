@@ -26,7 +26,7 @@ async function  verifyToken(
     decoded = Jwt.verify(token, Config.token.secret);
   } catch (e) {
     ctx.status=400
-    ctx.body='Wrong Token'
+    ctx.body='Session expired'
     allowed = false;
     return
   }

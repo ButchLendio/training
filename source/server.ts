@@ -8,8 +8,6 @@ import ProductsRoutes from './routes/products';
 import UsersRoutes from './routes/users';
 //Connect to mongo
 
-Config.mongo.connectWithRetry()
-
 async function Connect(){
    const connect= Config.mongo.connectWithRetry()
    return connect
