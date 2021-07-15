@@ -1,13 +1,12 @@
 import Products from '../models/products';
 
 const addProducts = async(ctx,next) =>{
-    try {
-    let { name, price ,createdBy} = ctx.request.body;
+   
+    let { name, price} = ctx.request.body;
 
     const product = new Products({
         name,
-        price,
-        createdBy
+        price
     })
 
     if(!name){
@@ -18,11 +17,6 @@ const addProducts = async(ctx,next) =>{
     if(!price){
         ctx.status= 400
         ctx.message='Price require'
-        return
-    }
-    if(!createdBy){
-        ctx.status= 400
-        ctx.message='Owner require'
         return
     }
 
@@ -36,10 +30,6 @@ const addProducts = async(ctx,next) =>{
     
         ctx.status=200
         ctx.body={res}
-    }
-    } catch (error) {
-        ctx.status=400
-        ctx.message=error 
     }
 }
 

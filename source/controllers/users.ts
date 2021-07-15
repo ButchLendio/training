@@ -3,9 +3,19 @@ import Users from '../models/users';
 import Config from '../configs/config'
 import Jwt from 'jsonwebtoken'
 
-const addUser = async(ctx ,next) => {
-    let { username, password } = ctx.request.body;
+import Auth from 'basic-auth'
 
+const addUser = async(ctx) => {
+    const authCredentials = Auth(ctx)
+    const {name}=ctx.request.body
+    const username = authCredentials.name
+    const password = authCredentials.pass
+
+        if(!name){
+            ctx.status= 400
+            ctx.message='Username require'
+            return
+        }
         if(!username){
             ctx.status= 400
             ctx.message='Username require'
@@ -18,6 +28,7 @@ const addUser = async(ctx ,next) => {
         }
 
     const user = new Users({
+        name,
         username,
         password: await Bcryptjs.hash(password, 10)
     })
@@ -29,19 +40,19 @@ const addUser = async(ctx ,next) => {
         ctx.body='User already exist'
     }else{
         const res = await user.save()
-    
         ctx.status=200
         ctx.body={res}
     }
 }
 
 const login = async(ctx ,next) => {
-    let {username, password} = ctx.request.body;
+    
+    const authCredentials = Auth(ctx)
+    const username = authCredentials.name
+    const password = authCredentials.pass
 
     try {
-        
         const user = await Users.findOne({username})
-
         if(!username){
             ctx.status= 400
             ctx.message='Username require'
@@ -49,16 +60,16 @@ const login = async(ctx ,next) => {
         }
         if(!password){
             ctx.status= 400
-            ctx.message='Password require'
+            ctx.message='Username require'
+            return
+        }
+        if(!user){
+            ctx.status = 400
+            ctx.message='User not registerd'
             return
         }
 
-        if(!user){
-            ctx.status = 400
-            throw new Error("Not found")
-        }
-
-        const Bcrypt = await Bcryptjs.compare(password, user.password)
+        const Bcrypt = await Bcryptjs.compare(password,user.password)
         if(Bcrypt){
             const timeInMilliseconds = new Date().getTime();
             const expirationTime  = timeInMilliseconds + Number(Config.token.expireTime) * 10_000;
@@ -76,7 +87,7 @@ const login = async(ctx ,next) => {
             )
             ctx.status= 200
             ctx.message='Auth Successful'
-            ctx.body={user,token}
+            ctx.body={token}
         }else{
             ctx.status= 401
             ctx.message='Unauthorized'

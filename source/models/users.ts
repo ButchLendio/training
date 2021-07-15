@@ -3,6 +3,7 @@ import IUsers from '../interfaces/users';
 
 const UserSchema: Schema = new Schema(
     {
+        name:{type: String, require: true },
         username: { type: String, require: true },
         password: { type: String, require: true }
     },
