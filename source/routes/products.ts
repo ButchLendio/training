@@ -5,7 +5,9 @@ import verifyToken from '../middleware/extract-jwt';
 const router = new Router();
 router.post('/products',verifyToken, Controller.addProducts);
 
-router.get('/products', Controller.getAllProducts);
+router.patch('/products/:id',verifyToken,Controller.updateProduct);
+
+router.get('/products', verifyToken,Controller.getAllProducts);
 
 export = router;
  

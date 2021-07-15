@@ -83,7 +83,7 @@ const login = async(ctx ,next) => {
         }
         
     } catch (error) {
-        ctx.status= 500
+        ctx.status= 400
         ctx.message=error.message
         error
     }

@@ -38,11 +38,31 @@ const addProducts = async(ctx,next) =>{
         ctx.body={res}
     }
     } catch (error) {
-        ctx.status=500
+        ctx.status=400
         ctx.message=error 
     }
 }
 
+const updateProduct = async(ctx,next) =>{
+    try {
+        const id =ctx.params.id
+        let body = ctx.request.body;
+
+        const execute = await Products.findByIdAndUpdate(id, body)
+
+        if(execute){
+            const result = await Products.findById(id)
+            ctx.status=200
+            ctx.body={result}
+        }else{
+        ctx.status=400
+        ctx.message="Error on updated " 
+        } 
+    } catch (error) {
+        ctx.status=400
+        ctx.message=error 
+    }
+}
 
 const getAllProducts = async (ctx,next) => {
     try {
@@ -50,9 +70,12 @@ const getAllProducts = async (ctx,next) => {
         ctx.status=200
         ctx.body={results} 
     } catch (error) {
-        ctx.status=500
+        ctx.status=400
         ctx.message=error 
     }
 };
 
-export default { addProducts,getAllProducts };
+export default {
+     addProducts, 
+     updateProduct, 
+     getAllProducts };

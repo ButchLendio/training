@@ -4,7 +4,7 @@ import { commerce, finance } from 'faker';
 import Server from '../../server';
 import Products from '../../models/products';
 
-afterEach(() => {
+after(() => {
     Products.deleteMany({ name: randomItem }).exec();
 });
 let randomItem, randomAmount, presentItem, presentAmount, token, id;
@@ -71,4 +71,13 @@ describe('Product Test', () => {
             .set({ Authorization: `Bearer ${token}` });
         expect(res.status).to.equal(400);
     });
+
+    // it('Add product - POST/products', async () => {
+    //     const find = await Products.fin
+    //     // const res = await Request(Server)
+    //     //     .patch(`/products`)
+    //     //     .send({ name: randomItem, price: randomAmount, createdBy: id })
+    //     //     .set({ Authorization: `Bearer ${token}` });
+    //     // expect(res.status).to.equal(200);
+    // });
 });
