@@ -6,12 +6,7 @@ import Logger from 'koa-logger'
 import Config from './configs/config';
 import ProductsRoutes from './routes/products';
 import UsersRoutes from './routes/users';
-import Mongoose from 'mongoose';
-
-const DB_URL = "http://localhost:50001/testing"
 //Connect to mongo
-
-Config.mongo.connectWithRetry()
 
 async function Connect(){
    const connect= Config.mongo.connectWithRetry()

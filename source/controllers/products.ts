@@ -1,4 +1,3 @@
-import Mongoose from 'mongoose';
 import Products from '../models/products';
 
 const getAllProducts = async (ctx,next) => {
