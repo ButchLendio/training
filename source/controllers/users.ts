@@ -10,20 +10,17 @@ export const addUser = async (ctx, next) => {
     const { name } = ctx.request.body;
     const username = authCredentials.name;
     const password = authCredentials.pass;
-    
-    if(!name){
-        ctx.status= 400
-        ctx.message='Name require'
+
+    if(!name || typeof name==="string"){
+        ctx.throw(400, 'Name required.');
         return
     }
-    if(!username){
-        ctx.status= 400
-        ctx.message='Username require'
+    if(!username || typeof name==="string"){
+        ctx.throw(400, 'Username required.');
         return
     }
-    if(!password){
-        ctx.status= 400
-        ctx.message='Password require'
+    if(!password || typeof name==="string"){
+        ctx.throw(400, 'Password required.');
         return
     }
 
@@ -36,8 +33,7 @@ export const addUser = async (ctx, next) => {
     const userExists = await Users.exists({ username });
 
     if (userExists) {
-        ctx.status = 400;
-        ctx.body = 'User already exist';
+        ctx.throw(400, 'User already exist');
     } else {
         const res = await Users.create(user);
         ctx.status = 200;
@@ -53,8 +49,7 @@ export const login = async (ctx, next) => {
 
     const user = await Users.findOne({ username });
     if (!user) {
-        ctx.status = 400;
-        ctx.message = 'User not registerd';
+        ctx.throw(400, 'User not registerd');
         return;
     }
 
@@ -81,7 +76,6 @@ export const login = async (ctx, next) => {
         ctx.message = 'Auth Successful';
         ctx.body = { token };
     } else {
-        ctx.status = 401;
-        ctx.message = 'Unauthorized';
+        ctx.throw(401, 'Unauthorized');
     }
 };
