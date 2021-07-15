@@ -5,11 +5,8 @@ import Jwt from 'jsonwebtoken'
 
 import Auth from 'basic-auth'
 
-const addUser = async(ctx) => {
-    const authCredentials = Auth(ctx)
-    const {name}=ctx.request.body
-    const username = authCredentials.name
-    const password = authCredentials.pass
+const addUser = async(ctx ,next) => {
+    let { username, password } = ctx.request.body;
 
 
     const user = new Users({
@@ -38,16 +35,6 @@ const login = async(ctx ,next) => {
 
     try {
         const user = await Users.findOne({username})
-        if(!username){
-            ctx.status= 400
-            ctx.message='Username require'
-            return
-        }
-        if(!password){
-            ctx.status= 400
-            ctx.message='Username require'
-            return
-        }
         if(!user){
             ctx.status = 400
             ctx.message='User not registerd'
