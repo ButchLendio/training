@@ -10,3 +10,5 @@ services:
             - ./mongo-data:/data/db
         ports:
             - 50001:27017
+volumes:
+    mongo-data:
