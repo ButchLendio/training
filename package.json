@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon source/server.ts",
     "build": "rm -rf build/ && prettier --write source/ && tsc",
-    "test": "NODE_ENV=test mocha --config source/test/.mocharc.json -r  ts-node/register \"source/test/**/*.spec.ts\" "
+    "test": "NODE_ENV=test mocha --config test/.mocharc.json -r  ts-node/register \"test/**/*.spec.ts\" "
   },
   "keywords": [],
   "author": "",
