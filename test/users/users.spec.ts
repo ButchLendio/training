@@ -13,7 +13,6 @@ afterEach(async function() {
 
     it("Login - POST/auth", async function (){
         const userCreate = generateFakeUser()
-        console.log(userCreate)
         await Users.create({
             ...userCreate,
             password:await Bcryptjs.hash(userCreate.password,10)
