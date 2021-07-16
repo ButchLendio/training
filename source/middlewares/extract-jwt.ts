@@ -11,7 +11,6 @@ export async function  verifyToken(
   const [authenticationType, token] = ctx.get('Authorization').split(' ');
   let decoded;
 
-
   if (authenticationType !== 'Bearer') {
     ctx.throw(400, "Not allowed")
   }
@@ -21,9 +20,10 @@ export async function  verifyToken(
   }
   try {
     decoded = Jwt.verify(token, Config.token.secret);
+    ctx.userName=decoded.username
+    return next()
   } catch (e) {
-    ctx.throw(400, "Session")
-  }
-await next()  
+    ctx.throw(400, "Session Expired")
+  } 
 }
 
