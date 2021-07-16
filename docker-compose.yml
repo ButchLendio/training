@@ -1,0 +1,12 @@
+version: "3"
+services:
+    mongo:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: mongoserver
+        restart: unless-stopped
+        volumes:
+            - ./mongo-data:/data/db
+        ports:
+            - 50001:27017
