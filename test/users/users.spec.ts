@@ -1,8 +1,8 @@
 import  Request  from 'supertest';
 import {expect} from 'chai'
 import {internet} from "faker"
-import Server from '../../server'
-import Users from "../../models/users"
+import Server from '../../source/server'
+import Users from "../../source/models/users"
 import Bcryptjs from 'bcryptjs';
 
 describe("Users Test", ()=>{
