@@ -5,11 +5,36 @@ import Jwt from 'jsonwebtoken';
 
 import Auth from 'basic-auth';
 
-const addUser = async (ctx, next) => {
+export const addUser = async (ctx, next) => {
     const authCredentials = Auth(ctx);
     const { name } = ctx.request.body;
     const username = authCredentials.name;
     const password = authCredentials.pass;
+
+    if(!name){
+        ctx.throw(400, 'Name required');
+        return
+    }
+    if(typeof name!="string"){
+        ctx.throw(400, 'Name must be string');
+        return
+    }
+    if(!username ){
+        ctx.throw(400, 'Username required');
+        return
+    }
+    if(typeof username!="string"){
+        ctx.throw(400, 'Username must be string');
+        return
+    }
+    if(!password){
+        ctx.throw(400, 'Password required');
+        return
+    }
+    if(typeof password!="string"){
+        ctx.throw(400, 'Password must be string');
+        return
+    }
 
     const user = new Users({
         name,
@@ -20,16 +45,15 @@ const addUser = async (ctx, next) => {
     const userExists = await Users.exists({ username });
 
     if (userExists) {
-        ctx.status = 400;
-        ctx.body = 'User already exist';
+        ctx.throw(400, 'User already exist');
     } else {
-        const res = await Users.create({user});
+        const res = await Users.create(user);
         ctx.status = 200;
         ctx.body = { res };
     }
 };
 
-const login = async (ctx, next) => {
+export const login = async (ctx, next) => {
     const authCredentials = Auth(ctx);
     
     const username = authCredentials.name;
@@ -37,8 +61,7 @@ const login = async (ctx, next) => {
 
     const user = await Users.findOne({ username });
     if (!user) {
-        ctx.status = 400;
-        ctx.message = 'User not registerd';
+        ctx.throw(400, 'User not registerd');
         return;
     }
 
@@ -65,9 +88,6 @@ const login = async (ctx, next) => {
         ctx.message = 'Auth Successful';
         ctx.body = { token };
     } else {
-        ctx.status = 401;
-        ctx.message = 'Unauthorized';
+        ctx.throw(401, 'Unauthorized');
     }
 };
-
-export default { addUser, login };

@@ -1,11 +1,11 @@
 import Router from 'koa-router'
-import Controller from '../controllers/users';
+import {addUser,login} from '../controllers/users';
 
 const router = new Router();
 
-router.post('/users', Controller.addUser);
+router.post('/users', addUser);
 
-router.post('/auth', Controller.login);
+router.post('/auth', login);
 
 export = router;
 
