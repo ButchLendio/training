@@ -8,27 +8,21 @@ export async function  verifyToken(
   next
 ) {
 
-  const bearer = ctx.get('Authorization').split(' ');
-
-  let allowed = true;
+  const [authenticationType, token] = ctx.get('Authorization').split(' ');
   let decoded;
 
-  const token = bearer[1];
 
-  if (bearer[0] !== 'Bearer') {
-    allowed = false;
+  if (authenticationType !== 'Bearer') {
+    ctx.throw(400, "Not allowed")
   }
 
   if (!token) {
-    allowed = false;
+    ctx.throw(400, "Must have token")
   }
   try {
     decoded = Jwt.verify(token, Config.token.secret);
   } catch (e) {
-    ctx.status=400
-    ctx.body='Session expired'
-    allowed = false;
-    return
+    ctx.throw(400, "Session")
   }
 await next()  
 }
