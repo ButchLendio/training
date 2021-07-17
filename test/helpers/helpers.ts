@@ -1,4 +1,4 @@
-import {internet,commerce} from "faker"
+import {internet,commerce,datatype} from "faker"
 
 export function generateFakeUser() {
     return {
@@ -10,6 +10,7 @@ export function generateFakeUser() {
 
 export function generateFakeProduct() {
     return {
+        id:datatype.uuid(),
         name: commerce.product(),
         price: commerce.price()
     }

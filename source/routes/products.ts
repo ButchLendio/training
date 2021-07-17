@@ -1,15 +1,12 @@
 import Router from 'koa-router'
 import {verifyToken} from '../middlewares/extract-jwt'
 import {
-    getAllProducts,
-    addProducts
+    addProduct
 } from '../controllers/products';
 
 const router = new Router();
 
-router.post('/products', verifyToken, addProducts)
-
-router.get('/products', getAllProducts);
+router.post('/products', verifyToken, addProduct)
 
 export = router;
  

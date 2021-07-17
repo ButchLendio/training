@@ -23,7 +23,7 @@ export async function  verifyToken(
     ctx.userName=decoded.username
     return next()
   } catch (e) {
-    ctx.throw(400, "Session Expired")
+    ctx.throw(400, "Invalid token")
   } 
 }
 

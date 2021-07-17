@@ -6,13 +6,11 @@ import Users from "../../source/models/users"
 import Bcryptjs from 'bcryptjs';
 import {generateFakeUser,generateFakeProduct} from '../helpers/helpers'
 
-describe("",()=>{
+describe("Product Test",()=>{
 
-afterEach(async function () {
+after(async function () {
         await Products.deleteMany({})
     })
-
-    let token
 
     it("Add product - POST/products", async function(){
         const userCreate = generateFakeUser()
@@ -22,44 +20,101 @@ afterEach(async function () {
         })
         const getToken = await Request(Server).post("/auth")
         .auth(userCreate.username,userCreate.password)
-        token = getToken.body.token
+        const token = getToken.body.token
 
         const res = await Request(Server).post("/products")
-        .send({name:generateFakeProduct().name,price:Number(generateFakeProduct().price)})
+        .send({
+            id:generateFakeProduct().id,
+            name:generateFakeProduct().name,
+            price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(200)  
     })
 
     it("Anauthorized - POST/products", async function(){
+        const userCreate = generateFakeUser()
+        const getToken = await Request(Server).post("/auth")
+        .auth(userCreate.username,userCreate.password)
+
         const res = await Request(Server).post("/products")
-        .send({name:generateFakeProduct().name,price:(generateFakeProduct().price)})
+        .send({
+            id:generateFakeProduct().id,
+            name:generateFakeProduct().name,
+            price:(generateFakeProduct().price)})
         expect(res.status).to.equal(400)  
     })
 
-    it("Price must be a number - POST/products", async function(){
+    it("Id required - POST/products", async function(){
+        const userCreate = generateFakeUser()
+        const getToken = await Request(Server).post("/auth")
+        .auth(userCreate.username,userCreate.password)
+        const token = getToken.body.token
+
         const res = await Request(Server).post("/products")
-        .send({name:generateFakeProduct().name,price:(generateFakeProduct().price)})
+        .send({
+            id:'',
+            name:generateFakeProduct().name,
+            price:Number(generateFakeProduct().price)})
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(400) 
+    })
+
+    it("Price must be a number - POST/products", async function(){
+        const userCreate = generateFakeUser()
+        const getToken = await Request(Server).post("/auth")
+        .auth(userCreate.username,userCreate.password)
+        const token = getToken.body.token
+
+        const res = await Request(Server).post("/products")
+        .send({
+            id:generateFakeProduct().id,
+            name:generateFakeProduct().name,
+            price:(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400)  
     })
 
     it("Name must be a string - POST/products", async function(){
+        const userCreate = generateFakeUser()
+        const getToken = await Request(Server).post("/auth")
+        .auth(userCreate.username,userCreate.password)
+        const token = getToken.body.token
+
         const res = await Request(Server).post("/products")
-        .send({name:Number(generateFakeProduct().price),price:Number(generateFakeProduct().price)})
+        .send({
+            id:generateFakeProduct().id,
+            name:Number(generateFakeProduct().price),
+            price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400)  
     })
 
     it("Name required - POST/products", async function(){
+        const userCreate = generateFakeUser()
+        const getToken = await Request(Server).post("/auth")
+        .auth(userCreate.username,userCreate.password)
+        const token = getToken.body.token
+
         const res = await Request(Server).post("/products")
-        .send({name:'',price:Number(generateFakeProduct().price)})
+        .send({
+            id:generateFakeProduct().id,
+            name:'',
+            price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400)  
     })
 
     it("Price required - POST/products", async function(){
+        const userCreate = generateFakeUser()
+        const getToken = await Request(Server).post("/auth")
+        .auth(userCreate.username,userCreate.password)
+        const token = getToken.body.token
+
         const res = await Request(Server).post("/products")
-        .send({name:generateFakeProduct().name,price:''})
+        .send({
+            id:generateFakeProduct().id,
+            name:generateFakeProduct().name,
+            price:''})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400) 
     })
