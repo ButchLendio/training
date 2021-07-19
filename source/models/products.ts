@@ -3,8 +3,8 @@ import IProducts from '../interfaces/products';
 
 const ProductSchema: Schema = new Schema(
     {
-        name: { type: String, require: true },
-        price: { type: String, require: true }
+        name: { type: String, required: true },
+        price: { type: String, required: true }
     },
     {
         timestamps: true
