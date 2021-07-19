@@ -1,14 +1,17 @@
 import Products from '../models/products';
 
-const getAllProducts = async (ctx,next) => {
-    try {
-        const results =  await Products.find()  
-        ctx.status=200
-        ctx.body={results} 
-    } catch (error) {
-        ctx.status=500
-        ctx.message=error 
-    }
-};
+export const updateProduct = async(ctx,next) =>{
+        const id =ctx.params.id
+        let body = ctx.request.body;
 
-export default { getAllProducts };
+        const execute = await Products.findByIdAndUpdate(id, body)
+
+        if(execute){
+            const result = await Products.findById(id)
+            ctx.status=200
+            ctx.body={result}
+        }else{
+            ctx.throw(400,"Error on update");
+        } 
+}
+
