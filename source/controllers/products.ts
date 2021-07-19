@@ -1,14 +1,27 @@
 import Products from '../models/products';
 
-const getAllProducts = async (ctx,next) => {
-    try {
-        const results =  await Products.find()  
-        ctx.status=200
-        ctx.body={results} 
-    } catch (error) {
-        ctx.status=500
-        ctx.message=error 
-    }
-};
 
-export default { getAllProducts };
+export const updateProduct = async(ctx,next) =>{
+    const id =ctx.params.id
+    const decodedUsername= ctx.userName
+
+    const findproduct = await Products.findById(id)
+    
+    if(!findproduct){
+        ctx.throw(400,"Product does not exist")
+        return
+    } 
+    
+    if(findproduct.createdBy !== decodedUsername){
+        ctx.throw(400,"Not the owener of the product")
+    }
+
+    const execute = await Products.findByIdAndDelete(id)
+
+    if(execute){
+        ctx.status=200
+    }else{
+        ctx.throw(400,"Error on delete")
+    } 
+
+}
