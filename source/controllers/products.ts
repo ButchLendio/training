@@ -1,7 +1,7 @@
 import Products from '../models/products';
 
 
-export const updateProduct = async(ctx,next) =>{
+export const deleteProduct = async(ctx,next) =>{
     const id =ctx.params.id
     const decodedUsername= ctx.userName
 
