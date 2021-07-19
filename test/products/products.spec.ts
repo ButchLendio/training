@@ -4,9 +4,13 @@ import Server from '../../source/server'
 import Products from '../../source/models/products'
 import Users from "../../source/models/users"
 import Bcryptjs from 'bcryptjs';
-import {generateFakeUser,generateFakeProduct} from '../helpers/helpers'
+import {
+    generateFakeUser,
+    generateFakeProduct,
+    addFakeUser,
+    addFakeProduct} from '../helpers/helpers'
 
-describe("Product Test",()=>{
+describe.only("Product Test",()=>{
 
 after(async function () {
         await Products.deleteMany({})
@@ -31,7 +35,7 @@ after(async function () {
         expect(res.status).to.equal(200)  
     })
 
-    it("Anauthorized - POST/products", async function(){
+    it("Unauthorized - POST/products", async function(){
         const userCreate = generateFakeUser()
         const getToken = await Request(Server).post("/auth")
         .auth(userCreate.username,userCreate.password)
@@ -40,7 +44,7 @@ after(async function () {
         .send({
             id:generateFakeProduct().id,
             name:generateFakeProduct().name,
-            price:(generateFakeProduct().price)})
+            price:generateFakeProduct().price})
         expect(res.status).to.equal(400)  
     })
 
@@ -116,6 +120,27 @@ after(async function () {
             name:generateFakeProduct().name,
             price:''})
         .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(400) 
+    })
+
+    it("Delete product - POST/products/:id", async function(){
+        const userCreate = generateFakeUser()
+        const fakeProduct = generateFakeProduct()
+        const token = await addFakeUser(userCreate)
+        const addMockProduct = await addFakeProduct(fakeProduct, token)
+
+        const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+    })
+
+    it("Unauthorized - POST/products/:id", async function(){
+        const userCreate = generateFakeUser()
+        const fakeProduct = generateFakeProduct()
+        const token = await addFakeUser(userCreate)
+        const addMockProduct = await addFakeProduct(fakeProduct, token)
+
+        const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
         expect(res.status).to.equal(400) 
     })
 
