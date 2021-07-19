@@ -13,27 +13,21 @@ export const addUser = async (ctx, next) => {
 
     if(!name){
         ctx.throw(400, 'Name required');
-        return
     }
     if(typeof name!="string"){
         ctx.throw(400, 'Name must be string');
-        return
     }
     if(!username ){
         ctx.throw(400, 'Username required');
-        return
     }
     if(typeof username!="string"){
         ctx.throw(400, 'Username must be string');
-        return
     }
     if(!password){
         ctx.throw(400, 'Password required');
-        return
     }
     if(typeof password!="string"){
         ctx.throw(400, 'Password must be string');
-        return
     }
 
     const user = new Users({
