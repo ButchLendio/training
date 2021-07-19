@@ -10,7 +10,7 @@ import {
     addFakeUser,
     addFakeProduct} from '../helpers/helpers'
 
-describe.only("Product Test",()=>{
+describe("Product Test",()=>{
 
 after(async function () {
         await Products.deleteMany({})
