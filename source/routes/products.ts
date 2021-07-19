@@ -1,12 +1,13 @@
 import Router from 'koa-router'
-import {verifyToken} from '../middlewares/extract-jwt'
-import {
-    addProduct
-} from '../controllers/products';
+import {deleteProduct,addProduct} from '../controllers/products';
+import { verifyToken } from '../middlewares/extract-jwt';
 
 const router = new Router();
 
 router.post('/products', verifyToken, addProduct)
+
+router.delete('/products/:id', verifyToken,deleteProduct);
+
 
 export = router;
  

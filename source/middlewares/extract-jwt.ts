@@ -9,7 +9,6 @@ export async function  verifyToken(
 ) {
 
   const [authenticationType, token] = ctx.get('Authorization').split(' ');
-  let decoded;
 
   if (authenticationType !== 'Bearer') {
     ctx.throw(400, "Not allowed")
@@ -19,9 +18,15 @@ export async function  verifyToken(
     ctx.throw(400, "Must have token")
   }
   try {
-    decoded = Jwt.verify(token, Config.token.secret);
-    ctx.userName=decoded.username
-    return next()
+    const decoded = Jwt.verify(token, Config.token.secret) as Jwt.JwtPayload;
+
+    if(!decoded){
+      ctx.throw(400,"Error")
+    }else{
+      ctx.userName=decoded.username
+      return next()
+    }
+    
   } catch (e) {
     ctx.throw(400, "Invalid token")
   } 

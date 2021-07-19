@@ -1,6 +1,26 @@
-import { Context } from 'mocha';
 import Products from '../models/products';
 
+export const deleteProduct = async(ctx,next) =>{
+    const foundProduct = await Products.findById(ctx.params.id)
+    
+    if(!foundProduct){
+        ctx.throw(400,"Product does not exist")
+        return
+    } 
+    
+    if(foundProduct.createdBy !== ctx.userName){
+        ctx.throw(400,"Not the owener of the product")
+    }
+
+    const result = await foundProduct.delete()
+
+    if(result){
+        ctx.status=200
+    }else{
+        ctx.throw(400,"Error on delete")
+    } 
+
+}
 export const addProduct = async(ctx,next) =>{
    
     const { id, name, price} = ctx.request.body;
