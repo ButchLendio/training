@@ -123,6 +123,47 @@ after(async function () {
         expect(res.status).to.equal(400) 
     })
 
+    it("Update product - POST/products/:id", async function(){
+        const userCreate = generateFakeUser()
+        const fakeProduct = generateFakeProduct()
+        const token = await addFakeUser(userCreate)
+        const addMockProduct = await addFakeProduct(fakeProduct, token)
+
+        const res = await Request(Server).patch(`/products/${addMockProduct._id}`)
+        .send({
+            price:Number(generateFakeProduct().price)})
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+    })
+
+    it("Update product - POST/products/:id", async function(){
+        const userCreate = generateFakeUser()
+        const fakeProduct = generateFakeProduct()
+        const token = await addFakeUser(userCreate)
+        const addMockProduct = await addFakeProduct(fakeProduct, token)
+
+        const res = await Request(Server).patch(`/products/${addMockProduct._id}`)
+        .send({
+            name:generateFakeProduct().name,
+            price:Number(generateFakeProduct().price)})
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+    })
+
+    
+    it("Unauthorized - POST/products/:id", async function(){
+        const userCreate = generateFakeUser()
+        const fakeProduct = generateFakeProduct()
+        const token = await addFakeUser(userCreate)
+        const addMockProduct = await addFakeProduct(fakeProduct, token)
+
+        const res = await Request(Server).patch(`/products/${addMockProduct._id}`)
+        .send({
+            name:generateFakeProduct().name,
+            price:Number(generateFakeProduct().price)})
+        expect(res.status).to.equal(400) 
+    })
+
     it("Delete product - POST/products/:id", async function(){
         const userCreate = generateFakeUser()
         const fakeProduct = generateFakeProduct()
@@ -131,7 +172,22 @@ after(async function () {
 
         const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
         .set('Authorization',`Bearer ${token}`)
-        expect(res.status).to.equal(200) 
+        expect(res.status).to.equal(400) 
+    })
+
+    it("Not the owner of the product - POST/products/:id", async function(){
+        const userCreate = generateFakeUser()
+        const userCreateMock = generateFakeUser()
+
+        const fakeProduct = generateFakeProduct()
+        const token = await addFakeUser(userCreate)
+        const tokenMock = await addFakeUser(userCreateMock)
+
+        const addMockProduct = await addFakeProduct(fakeProduct, token)
+
+        const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
+        .set('Authorization',`Bearer ${tokenMock}`)
+        expect(res.status).to.equal(400) 
     })
 
     it("Unauthorized - POST/products/:id", async function(){

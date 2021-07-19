@@ -1,7 +1,7 @@
 import Products from '../models/products';
 
 export const updateProduct = async(ctx,next) =>{
-    const id =ctx.params.id
+    const {id} =ctx.params
     const decodedUsername=ctx.userName
     let body = ctx.request.body;
 
@@ -11,11 +11,11 @@ export const updateProduct = async(ctx,next) =>{
         ctx.throw(404,"Product does not exist");
         return
     }
-    if(product.createdBy !== decodedUsername){
+    if(product.createdBy !== decodedUsername    ){
         ctx.throw(400,"Not the owner of the product")
     }
 
-    const updateProduct = await Products.findByIdAndUpdate(id, body)
+    const updateProduct = await Products.updateOne({id, body})
 
     if(updateProduct){
         const result = await Products.findById(id)
