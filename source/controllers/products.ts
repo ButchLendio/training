@@ -26,6 +26,10 @@ export const addProduct = async(ctx,next) =>{
     const { id, name, price} = ctx.request.body;
 
     const decodedUsername = ctx.userName
+    const buffer = Buffer.alloc(8, 0);
+    buffer.writeBigUInt64BE(BigInt(Date.now()));
+    const converBufer =Buffer.from('utf-8');
+    const toStringBuffer = Buffer.concat([buffer, converBufer]).toString('hex');
  
     if(!id){
         ctx.throw(400, 'Id required');
@@ -52,7 +56,8 @@ export const addProduct = async(ctx,next) =>{
                 id,
                 name,
                 price,
-                createdBy:decodedUsername
+                createdBy:decodedUsername,
+                cursor:toStringBuffer,
             })
         ctx.status=200
         ctx.body={res}
