@@ -1,3 +1,4 @@
+import console from 'console';
 import Products from '../models/products';
 
 export const deleteProduct = async(ctx,next) =>{
@@ -58,4 +59,68 @@ export const addProduct = async(ctx,next) =>{
         ctx.body={res}
     }
 }
+
+export const getAllProducts = async (ctx,next) => {
+        const {first,last,after,before,sort,order} = ctx.request.query  
+        console.log(first,last,after,before,sort,order)
+        const sortBy =sort.split(',')
+        console.log(sortBy)
+
+        const totalProducts =  await Products.find()  
+        let filterlast
+        // if(first){
+
+        // }
+        if(last){
+        filterlast = await Products.aggregate([
+                { 
+                    $skip: (totalProducts.length-Number(last))
+                },  
+            ]) 
+        }
+        console.log(filterlast) 
+        // console.log(last)
+
+        // const filter = await Products.$where(`cursor < '${before || after}'`)
+        // console.log(filter)
+        // console.log(results)
+        const wew = await Products.aggregate([
+            // { $match:{ 
+            //     cursor: { 
+            //         $gt: after || before
+            //         }
+            //     } 
+            // },
+            { 
+                $skip: (totalProducts.length-Number(last))
+            },
+            // {
+            //     $sort:{
+            //             name: 1 ,
+            //             id: 1,   
+            //     }
+            // }     
+        ])
+
+        // console.log(wew)
+        console.log(wew.length)
+        const pageInfo = {
+            startCursor: after || before,
+            endCursor:after || before,
+            totalCount: wew.length
+        }
+        console.log(pageInfo)
+
+        // for (let index = 0; index < results.length; index++) {
+        //     const element = results[index];
+            
+        // }
+
+        // if(results){   
+        //     ctx.status=200
+        //     ctx.body={results} 
+        // }else{
+        //    ctx.throw(400,"Not found.") 
+        // }
+};
 
