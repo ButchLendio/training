@@ -49,7 +49,11 @@ export const deleteProduct = async(ctx,next) =>{
 export const addProduct = async(ctx,next) =>{
    
     const { id, name, price} = ctx.request.body;
-
+    const createdAt = new Date();
+    const cursor = Buffer.concat([
+        Buffer.from(`${createdAt.getTime()}`),
+        Buffer.from(id),
+    ]);
     const decodedUsername = ctx.userName
  
     if(!id){
@@ -77,7 +81,8 @@ export const addProduct = async(ctx,next) =>{
                 id,
                 name,
                 price,
-                createdBy:decodedUsername
+                createdBy:decodedUsername,
+                cursor:cursor,
             })
         ctx.status=200
         ctx.body={res}
