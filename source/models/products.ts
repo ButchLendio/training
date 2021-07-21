@@ -7,6 +7,10 @@ const ProductSchema: Schema = new Schema(
         name: { type: String, required: true },
         price: { type: String, required: true },
         createdBy:{type:String, required: true },
+        cursor: {
+            type: Buffer,
+            index: true,
+          },
     },
     {
         timestamps: true
