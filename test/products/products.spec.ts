@@ -3,6 +3,7 @@ import {expect} from 'chai'
 import Server from '../../source/server'
 import R from 'ramda'
 import Users from "../../source/models/users"
+import Products from "../../source/models/products"
 import Bcryptjs from 'bcryptjs';
 import {
     generateFakeUser,
@@ -13,9 +14,9 @@ import {
 
 describe("Product Test",()=>{
 
-// after(async function () {
-//         await Products.deleteMany({})
-//     })
+after(async function () {
+        await Products.deleteMany({})
+    })
 
     it("Add product - POST/products", async function(){
         const userCreate = generateFakeUser()
@@ -214,7 +215,7 @@ describe("Product Test",()=>{
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
 
-        await populateProduct(token)
+        await populateProduct()
 
         const res = await Request(Server).get(`/products`)
         .set('Authorization',`Bearer ${token}`)
@@ -227,7 +228,7 @@ describe("Product Test",()=>{
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
 
-        await populateProduct(token)
+        await populateProduct()
 
         const res = await Request(Server).get(`/products?first=3`)
         .set('Authorization',`Bearer ${token}`)
@@ -239,7 +240,7 @@ describe("Product Test",()=>{
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
 
-        await populateProduct(token)
+        await populateProduct()
   
         const foundCursor = await Request(Server).get(`/products?first=3`)
         .set('Authorization',`Bearer ${token}`) 
@@ -256,7 +257,7 @@ describe("Product Test",()=>{
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
 
-        await populateProduct(token)
+        await populateProduct()
   
         const foundCursor = await Request(Server).get(`/products?first=3`)
         .set('Authorization',`Bearer ${token}`) 

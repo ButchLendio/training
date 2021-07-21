@@ -2,6 +2,8 @@ import {internet,commerce,datatype} from "faker"
 import Products from '../../source/models/products';
 import  Request  from 'supertest';
 import server from '../../source/server'
+import R from 'ramda'
+
 
 
 export function generateFakeUser() {
@@ -44,74 +46,7 @@ export async function addFakeProduct(fakeProduct:{id:string,name:string,price:st
     return(res.body.res)
 }
 
-export async function populateProduct(token:string) {
-     await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
-
-    await Request(server).post("/products")
-    .send({
-        id:datatype.uuid(),
-        name: commerce.product(),
-        price: Number(commerce.price())})
-    .set('Authorization',`Bearer ${token}`)
+export async function populateProduct() {
+    Products.create(R.times(() => generateFakeProduct())(20))
+     
 }
