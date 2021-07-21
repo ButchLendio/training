@@ -1,5 +1,5 @@
-import console from 'console';
 import Products from '../models/products';
+import R from 'ramda'
 
 export const deleteProduct = async (ctx, next) => {
     const foundProduct = await Products.findById(ctx.params.id);
@@ -10,7 +10,7 @@ export const deleteProduct = async (ctx, next) => {
     }
 
     if (foundProduct.createdBy !== ctx.userName) {
-        ctx.throw(400, 'Not the owener of the product');
+        ctx.throw(400, 'Not the owner of the product');
     }
 
     const result = await foundProduct.delete();
@@ -59,46 +59,131 @@ export const addProduct = async (ctx, next) => {
 
 export const getAllProducts = async (ctx, next) => {
     const { first, last, after, before, sort, order } = ctx.request.query;
-    console.log(first, last, after, before, sort, order);
 
-    let convertedCurser,
+    let convertedCursor,
         totalProducts,
         startCursor,
         endCursor,
         products,
         hasNextPage,
-        hasPreviousPage,
-        finalReturn: any = []
+        hasPreviousPage
+        
+    const finalReturn:{
+        product:{
+            id:string,
+            name:string,
+            price:string,
+            createdAt:Date,
+            updatedAt:Date
+        },
+        cursor:string
+    }[]=[]
+
+    //for first only
+    if (!first && !after) {
+        products = await Products.find().limit(5)
+        console.log
+        if(!products){
+            ctx.throw(400,"No data")
+        }
+        convertedCursor = Buffer.from(R.head(products).cursor, 'base64');
+        hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
+        hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
+
+        products.map((product) => {
+            const data = {
+              product: {
+                id: product._id,
+                name: product.name,
+                price: product.price,
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt,
+              },
+              cursor: Buffer.from(product.cursor).toString('base64'),
+            };
+            finalReturn.push(data);
+          });
+
+        startCursor = Buffer.from(R.head(products).cursor, 'base64').toString('base64');
+        endCursor = Buffer.from(R.last(products).cursor, 'base64').toString('base64');
+
+        ctx.body = {
+            products: finalReturn,
+            pageInfo: {
+                startCursor,
+                endCursor,
+                hasNextPage,
+                hasPreviousPage,
+                totalCount: products.length
+            }
+        };
+    }
+
+    //for first only
+    if (first && !after) {
+        products = await Products.find().limit(Number(first))
+
+        convertedCursor = Buffer.from(R.head(products).cursor, 'base64');
+        hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
+        hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
+
+        products.map((product) => {
+            const data = {
+              product: {
+                id: product._id,
+                name: product.name,
+                price: product.price,
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt,
+              },
+              cursor: Buffer.from(product.cursor).toString('base64'),
+            };
+            finalReturn.push(data);
+          });
+
+        startCursor = Buffer.from(R.head(products).cursor, 'base64').toString('base64');
+        endCursor = Buffer.from(R.last(products).cursor, 'base64').toString('base64');
+
+        ctx.body = {
+            products: finalReturn,
+            pageInfo: {
+                startCursor,
+                endCursor,
+                hasNextPage,
+                hasPreviousPage,
+                totalCount: products.length
+            }
+        };
+    }
 
     //for first and after
     if (first && after) {
-        convertedCurser = Buffer.from(after, 'base64');
-        hasNextPage = await Products.exists({ cursor: { $gt: convertedCurser } });
-        hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCurser } });
+        convertedCursor = Buffer.from(after, 'base64');
+        hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
+        hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
 
         products = await Products.find({
             cursor: {
-                $gt: convertedCurser
+                $gt: convertedCursor
             }
-        }).limit(first * 1);
+        }).limit(Number(first));
 
-        for (let index = 0; index < products.length; index++) {
-            const element = products[index];
+        products.map((product) => {
             const data = {
-                product: {
-                    id: element._id,
-                    name: element.name,
-                    price: element.price,
-                    createdAt: element.createdAt,
-                    updatedAt: element.updatedAt
-                },
-                cursor: Buffer.from(element.cursor, 'base64').toString('base64')
+              product: {
+                id: product._id,
+                name: product.name,
+                price: product.price,
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt,
+              },
+              cursor: Buffer.from(product.cursor).toString('base64'),
             };
             finalReturn.push(data);
-        }
+          });
 
-        startCursor = Buffer.from(products[0].cursor, 'base64').toString('base64');
-        endCursor = Buffer.from(products[products.length - 1].cursor, 'base64').toString('base64');
+        startCursor = Buffer.from(R.head(products).cursor, 'base64').toString('base64');
+        endCursor = Buffer.from(R.last(products).cursor, 'base64').toString('base64');
 
         ctx.body = {
             products: finalReturn,
@@ -116,33 +201,33 @@ export const getAllProducts = async (ctx, next) => {
     if (last && before) {
         totalProducts = await Products.find();
 
-        convertedCurser = Buffer.from(before, 'base64');
-        hasNextPage = await Products.exists({ cursor: { $gt: convertedCurser } });
-        hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCurser } });
+        convertedCursor = Buffer.from(before, 'base64');
+        hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
+        hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
 
         products = await Products.find({
             cursor: {
-                $lt: convertedCurser
+                $lt: convertedCursor
             }
         }).skip(totalProducts.length - 1 - last);
 
-        for (let index = 0; index < products.length; index++) {
-            const element = products[index];
+        products.map((product) => {
+            console.log(product )
             const data = {
-                product: {
-                    id: element._id,
-                    name: element.name,
-                    price: element.price,
-                    createdAt: element.createdAt,
-                    updatedAt: element.updatedAt
-                },
-                cursor: Buffer.from(element.cursor, 'base64').toString('base64')
+              product: {
+                id: product._id,
+                name: product.name,
+                price: product.price,
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt,
+              },
+              cursor: Buffer.from(product.cursor).toString('base64'),
             };
             finalReturn.push(data);
-        }
+          });
 
-        startCursor = Buffer.from(products[0].cursor, 'base64').toString('base64');
-        endCursor = Buffer.from(products[products.length - 1].cursor, 'base64').toString('base64');
+        startCursor = Buffer.from(R.head(products).cursor, 'base64').toString('base64');
+        endCursor = Buffer.from(R.last(products).cursor, 'base64').toString('base64');
 
         ctx.body = {
             products: finalReturn,
