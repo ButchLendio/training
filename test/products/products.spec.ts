@@ -141,13 +141,10 @@ after(async function () {
             name:generateFakeProduct().name,
             price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
-        
-        const productExists = await Products.exists({ id: fakeProduct.id })
 
         expect(res.status).to.equal(200)
-        expect(productExists).to.be.true
+        expect(res.body.updateProduct.ok).to.equal(1)
     })
-
     
     it("Unauthorized - POST/products/:id", async function(){
         const userCreate = generateFakeUser()
