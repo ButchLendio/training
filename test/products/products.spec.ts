@@ -8,13 +8,14 @@ import {
     generateFakeUser,
     generateFakeProduct,
     addFakeUser,
-    addFakeProduct} from '../helpers/helpers'
+    addFakeProduct,
+    populateProduct} from '../helpers/helpers'
 
 describe("Product Test",()=>{
 
-after(async function () {
-        await Products.deleteMany({})
-    })
+// after(async function () {
+//         await Products.deleteMany({})
+//     })
 
     it("Add product - POST/products", async function(){
         const userCreate = generateFakeUser()
@@ -207,6 +208,20 @@ after(async function () {
         const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
         expect(res.status).to.equal(400) 
         expect(res.text).to.equal("Not allowed")
+    })
+
+    it.only("Get product in default - GET/products", async function(){
+        const userCreate = generateFakeUser()
+        const fakeProduct = generateFakeProduct()
+        const token = await addFakeUser(userCreate)
+
+        await populateProduct(token)
+
+        const res = await Request(Server).get(`/products`)
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+        expect(res.body.products.length).to.equal(res.body.pageInfo.totalCount)
+
     })
 
 })
