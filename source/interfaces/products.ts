@@ -5,5 +5,5 @@ export default interface Products extends Document {
     name: string;
     price: string;
     createdBy: string;
-    cursor:string;
+    cursor: string;
 }

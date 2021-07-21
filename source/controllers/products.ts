@@ -1,32 +1,38 @@
 import Products from '../models/products';
 import R from 'ramda'
 
-export const deleteProduct = async (ctx, next) => {
-    const foundProduct = await Products.findById(ctx.params.id);
-
-    if (!foundProduct) {
-        ctx.throw(400, 'Product does not exist');
-        return;
+export const deleteProduct = async(ctx,next) =>{
+    const foundProduct = await Products.findById(ctx.params.id)
+    
+    if(!foundProduct){
+        ctx.throw(400,"Product does not exist")
+        return
+    } 
+    
+    if(foundProduct.createdBy !== ctx.userName){
+        ctx.throw(400,"Not the owener of the product")
     }
 
-    if (foundProduct.createdBy !== ctx.userName) {
-        ctx.throw(400, 'Not the owner of the product');
-    }
+    const result = await foundProduct.delete()
 
-    const result = await foundProduct.delete();
+    if(result){
+        ctx.status=200
+    }else{
+        ctx.throw(400,"Error on delete")
+    } 
 
-    if (result) {
-        ctx.status = 200;
-    } else {
-        ctx.throw(400, 'Error on delete');
-    }
-};
-export const addProduct = async (ctx, next) => {
-    const { id, name, price } = ctx.request.body;
-
-    const decodedUsername = ctx.userName;
-
-    if (!id) {
+}
+export const addProduct = async(ctx,next) =>{
+   
+    const { id, name, price} = ctx.request.body;
+    const createdAt = new Date();
+    const cursor = Buffer.concat([
+        Buffer.from(`${createdAt.getTime()}`),
+        Buffer.from(id),
+    ]);
+    const decodedUsername = ctx.userName
+ 
+    if(!id){
         ctx.throw(400, 'Id required');
     }
     if (!name) {
