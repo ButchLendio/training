@@ -95,7 +95,8 @@ export const addProduct = async(ctx,next) =>{
             id,
             name,
             price,
-            createdBy: decodedUsername
+            createdBy: decodedUsername,
+            cursor
         });
         ctx.status = 200;
         ctx.body = { res };
@@ -103,10 +104,9 @@ export const addProduct = async(ctx,next) =>{
 };
 
 export const getAllProducts = async (ctx, next) => {
-    const { first, last, after, before, sort, order } = ctx.request.query;
+    const { first, after, sort } = ctx.request.query;
 
     let convertedCursor,
-        totalProducts,
         startCursor,
         endCursor,
         products,
@@ -127,7 +127,6 @@ export const getAllProducts = async (ctx, next) => {
     //for first only
     if (!first && !after) {
         products = await Products.find().limit(5)
-        console.log
         if(!products){
             ctx.throw(400,"No data")
         }
@@ -165,7 +164,7 @@ export const getAllProducts = async (ctx, next) => {
     }
 
     //for first only
-    if (first && !after) {
+    if (first && !after && !sort) {
         products = await Products.find().limit(Number(first))
 
         convertedCursor = Buffer.from(R.head(products).cursor, 'base64');
@@ -202,14 +201,14 @@ export const getAllProducts = async (ctx, next) => {
     }
 
     //for first and after
-    if (first && after) {
+    if (first && after && !sort) {
         convertedCursor = Buffer.from(after, 'base64');
         hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
         hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
 
         products = await Products.find({
             cursor: {
-                $gt: convertedCursor
+                $gte: convertedCursor
             }
         }).limit(Number(first));
 
@@ -242,22 +241,22 @@ export const getAllProducts = async (ctx, next) => {
         };
     }
 
-    //for last and before
-    if (last && before) {
-        totalProducts = await Products.find();
-
-        convertedCursor = Buffer.from(before, 'base64');
+    // for first,after and sort
+    if (first && after && sort) {
+        console.log("WEWs")
+        convertedCursor = Buffer.from(after, 'base64');
         hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
         hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
 
         products = await Products.find({
             cursor: {
-                $lt: convertedCursor
+                $gte: convertedCursor
             }
-        }).skip(totalProducts.length - 1 - last);
+        })
+        .limit(Number(first))
+        .sort({sort : 1})
 
         products.map((product) => {
-            console.log(product )
             const data = {
               product: {
                 id: product._id,
