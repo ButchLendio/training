@@ -45,70 +45,70 @@ export async function addFakeProduct(fakeProduct:{id:string,name:string,price:st
 }
 
 export async function populateProduct(token:string) {
-     await Request(Server).post("/products")
+     await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
         price: Number(commerce.price())})
     .set('Authorization',`Bearer ${token}`)
 
-    await Request(Server).post("/products")
+    await Request(server).post("/products")
     .send({
         id:datatype.uuid(),
         name: commerce.product(),
