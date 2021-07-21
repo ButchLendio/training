@@ -1,7 +1,7 @@
 import {internet,commerce,datatype} from "faker"
 import Products from '../../source/models/products';
 import  Request  from 'supertest';
-import Server from '../../source/server'
+import server from '../../source/server'
 
 
 export function generateFakeUser() {
@@ -21,11 +21,11 @@ export function generateFakeProduct() {
 }
 
 export async function addFakeUser(fakeUser:{name:string,username:string,password:string}) {
-     await Request(Server).post("/users")
+     await Request(server).post("/users")
     .send({name:fakeUser.name})
     .auth(fakeUser.username,fakeUser.password,{type: "basic"})
    
-    const res = await Request(Server).post("/auth")
+    const res = await Request(server).post("/auth")
     .auth(fakeUser.username,fakeUser.password,{type: "basic"})
     
     return (res.body.token)
@@ -34,7 +34,7 @@ export async function addFakeUser(fakeUser:{name:string,username:string,password
 
 export async function addFakeProduct(fakeProduct:{id:string,name:string,price:string},token:string) {
 
-    const res = await Request(Server).post("/products")
+    const res = await Request(server).post("/products")
     .send({
         id:fakeProduct.id,
         name:fakeProduct.name,
