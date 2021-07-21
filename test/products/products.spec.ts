@@ -12,9 +12,9 @@ import {
 
 describe("Product Test",()=>{
 
-// after(async function () {
-//         await Products.deleteMany({})
-//     })
+after(async function () {
+        await Products.deleteMany({})
+    })
 
     it("Add product - POST/products", async function(){
         const userCreate = generateFakeUser()
@@ -123,27 +123,36 @@ describe("Product Test",()=>{
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
         const addMockProduct = await addFakeProduct(fakeProduct, token)
+        const data={
+            price:Number(generateFakeProduct().price)
+        }
 
         const res = await Request(Server).patch(`/products/${addMockProduct._id}`)
-        .send({
-            price:Number(generateFakeProduct().price)})
+        .send(data)
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(200) 
+        expect(res.body.message).to.equal("Product updated")
+        expect(res.body.product.price).to.equal(data.price.toString())
     })
 
-    it.only("Update product - PATCH/products/:id", async function(){
+    it("Update product - PATCH/products/:id", async function(){
         const userCreate = generateFakeUser()
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
         const addMockProduct = await addFakeProduct(fakeProduct, token)
-        const res = await Request(Server).patch(`/products/${addMockProduct._id}`)
-        .send({
+        const data={
             name:generateFakeProduct().name,
-            price:Number(generateFakeProduct().price)})
+            price:Number(generateFakeProduct().price)
+        }
+
+        const res = await Request(Server).patch(`/products/${addMockProduct._id}`)
+        .send(data)
         .set('Authorization',`Bearer ${token}`)
 
         expect(res.status).to.equal(200)
         expect(res.body.message).to.equal("Product updated")
+        expect(res.body.product.name).to.equal(data.name)
+        expect(res.body.product.price).to.equal(data.price.toString())
     })
     
     it("Unauthorized - PATCH/products/:id", async function(){
