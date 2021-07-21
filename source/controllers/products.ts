@@ -63,53 +63,88 @@ export const addProduct = async(ctx,next) =>{
 export const getAllProducts = async (ctx,next) => {
         const {first,last,after,before,sort,order} = ctx.request.query  
         console.log(first,last,after,before,sort,order)
-        const sortBy =sort.split(',')
-        console.log(sortBy)
+        let convertedCurser,
+            totalProducts
 
-        const totalProducts =  await Products.find()  
-        let filterlast
+        // const convertedCurser=Buffer.from(after || before, 'base64')
+        // console.log(convertedCurser)
+
+        // const sortBy =sort.split(',')
+        const hasNextPage = await Products.exists({ cursor: { $gt: convertedCurser} });
+        console.log(hasNextPage)
+
+        if(first && after){
+            console.log("1")
+            convertedCurser=Buffer.from(after, 'base64')
+
+            const products = await Products.find({
+                cursor:{
+                    $gt:convertedCurser
+                }
+        }) 
+                    .limit(first * 1)
+        console.log(products)
+        }    
+        
+        if(last && before){
+            console.log("2")
+            totalProducts = await Products.find()
+            convertedCurser=Buffer.from(before, 'base64')
+
+            console.log(convertedCurser)
+            const products = await Products.find({
+                cursor:{
+                    $lt:convertedCurser
+                }
+        }) 
+                    .skip(totalProducts.length-last)
+        console.log(products)
+        }  
+
+        // const totalProducts =  await Products.find()  
+        // let filterlast
         // if(first){
 
         // }
-        if(last){
-        filterlast = await Products.aggregate([
-                { 
-                    $skip: (totalProducts.length-Number(last))
-                },  
-            ]) 
-        }
-        console.log(filterlast) 
+        // if(last){
+        // filterlast = await Products.aggregate([
+        //         { 
+        //             $skip: (totalProducts.length-Number(last))
+        //         },  
+        //     ]) 
+        // }
+        // console.log(filterlast) 
         // console.log(last)
 
         // const filter = await Products.$where(`cursor < '${before || after}'`)
         // console.log(filter)
         // console.log(results)
-        const wew = await Products.aggregate([
+        // const wew = await Products.aggregate([
             // { $match:{ 
             //     cursor: { 
             //         $gt: after || before
             //         }
             //     } 
             // },
-            { 
-                $skip: (totalProducts.length-Number(last))
-            },
+            // { 
+            //     $skip: (totalProducts.length-Number(last))
+            // },
             // {
             //     $sort:{
             //             name: 1 ,
             //             id: 1,   
             //     }
             // }     
-        ])
+        // ])
 
         // console.log(wew)
-        console.log(wew.length)
-        const pageInfo = {
-            startCursor: after || before,
-            endCursor:after || before,
-            totalCount: wew.length
-        }
-        console.log(pageInfo)
+        // console.log(wew.length)
+        // const pageInfo = {
+        //     startCursor: after || before,
+        //     endCursor:after || before,
+        //     totalCount: wew.length
+        // }
+        // console.log(pageInfo)
 
         // for (let index = 0; index < results.length; index++) {
         //     const element = results[index];
