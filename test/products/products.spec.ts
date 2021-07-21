@@ -170,7 +170,7 @@ after(async function () {
 
     })
 
-    it("Delete product - POST/products/:id", async function(){
+    it("Delete product - DELETE/products/:id", async function(){
         const userCreate = generateFakeUser()
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
@@ -182,7 +182,7 @@ after(async function () {
 
     })
 
-    it("Not the owner of the product - POST/products/:id", async function(){
+    it("Not the owner of the product - DELETE/products/:id", async function(){
         const userCreate = generateFakeUser()
         const userCreateMock = generateFakeUser()
 
@@ -198,7 +198,7 @@ after(async function () {
         expect(res.text).to.equal("Not the owener of the product")
     })
 
-    it("Unauthorized - POST/products/:id", async function(){
+    it("Unauthorized - DELETE/products/:id", async function(){
         const userCreate = generateFakeUser()
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
