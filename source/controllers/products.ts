@@ -26,8 +26,8 @@ export const addProduct = async(ctx,next) =>{
     const { id, name, price} = ctx.request.body;
     const createdAt = new Date();
     const cursor = Buffer.concat([
-    Buffer.from(`${createdAt.getTime()}`),
-    Buffer.from(id),
+        Buffer.from(`${createdAt.getTime()}`),
+        Buffer.from(id),
     ]);
     const decodedUsername = ctx.userName
  
