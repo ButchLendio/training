@@ -24,12 +24,12 @@ export const deleteProduct = async(ctx,next) =>{
 export const addProduct = async(ctx,next) =>{
    
     const { id, name, price} = ctx.request.body;
-
+    const createdAt = new Date();
+    const cursor = Buffer.concat([
+    Buffer.from(`${createdAt.getTime()}`),
+    Buffer.from(id),
+    ]);
     const decodedUsername = ctx.userName
-    const buffer = Buffer.alloc(8, 0);
-    buffer.writeBigUInt64BE(BigInt(Date.now()));
-    const converBufer =Buffer.from('utf-8');
-    const toStringBuffer = Buffer.concat([buffer, converBufer]).toString('hex');
  
     if(!id){
         ctx.throw(400, 'Id required');
@@ -57,7 +57,7 @@ export const addProduct = async(ctx,next) =>{
                 name,
                 price,
                 createdBy:decodedUsername,
-                cursor:toStringBuffer,
+                cursor:cursor,
             })
         ctx.status=200
         ctx.body={res}
