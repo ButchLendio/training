@@ -5,6 +5,12 @@ export const updateProduct = async(ctx,next) =>{
     const decodedUsername=ctx.userName
     let body = ctx.request.body;
 
+    const updatedAt = new Date();
+    const cursor = Buffer.concat([
+        Buffer.from(`${updatedAt.getTime()}`),
+        Buffer.from(id),
+    ]); 
+
     const product = await Products.findById(id)
     
     if(!product){
@@ -15,11 +21,19 @@ export const updateProduct = async(ctx,next) =>{
         ctx.throw(400,"Not the owner of the product")
     }
 
-    const updateProduct = await Products.updateOne({id, body},{new: true})
+    const updatedProduct = await Products.updateOne(
+        { _id: id },
+        body,
+        cursor
+    )
 
-    if(updateProduct){
+    if(updatedProduct){
+        const foundProduct = await Products.findById(ctx.params.id)
         ctx.status=200
-        ctx.body={updateProduct}
+        ctx.body = {
+            message: "Product updated",
+            product:foundProduct
+           }
     }else{
         ctx.throw(400,"Error on update");
     } 

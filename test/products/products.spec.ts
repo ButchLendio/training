@@ -12,9 +12,9 @@ import {
 
 describe("Product Test",()=>{
 
-after(async function () {
-        await Products.deleteMany({})
-    })
+// after(async function () {
+//         await Products.deleteMany({})
+//     })
 
     it("Add product - POST/products", async function(){
         const userCreate = generateFakeUser()
@@ -118,7 +118,7 @@ after(async function () {
         expect(res.text).to.equal("Price required")
     })
 
-    it("Update product - POST/products/:id", async function(){
+    it("Update product - PATCH/products/:id", async function(){
         const userCreate = generateFakeUser()
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
@@ -131,7 +131,7 @@ after(async function () {
         expect(res.status).to.equal(200) 
     })
 
-    it("Update product - POST/products/:id", async function(){
+    it.only("Update product - PATCH/products/:id", async function(){
         const userCreate = generateFakeUser()
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
@@ -143,10 +143,10 @@ after(async function () {
         .set('Authorization',`Bearer ${token}`)
 
         expect(res.status).to.equal(200)
-        expect(res.body.updateProduct.ok).to.equal(1)
+        expect(res.body.message).to.equal("Product updated")
     })
     
-    it("Unauthorized - POST/products/:id", async function(){
+    it("Unauthorized - PATCH/products/:id", async function(){
         const userCreate = generateFakeUser()
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
