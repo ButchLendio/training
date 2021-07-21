@@ -15,12 +15,11 @@ export const updateProduct = async(ctx,next) =>{
         ctx.throw(400,"Not the owner of the product")
     }
 
-    const updateProduct = await Products.updateOne({id, body})
+    const updateProduct = await Products.updateOne({id, body},{new: true})
 
     if(updateProduct){
-        const result = await Products.findById(id)
         ctx.status=200
-        ctx.body={result}
+        ctx.body={updateProduct}
     }else{
         ctx.throw(400,"Error on update");
     } 

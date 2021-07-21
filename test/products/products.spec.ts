@@ -37,8 +37,7 @@ after(async function () {
 
     it("Unauthorized - POST/products", async function(){
         const userCreate = generateFakeUser()
-        const getToken = await Request(Server).post("/auth")
-        .auth(userCreate.username,userCreate.password)
+        const token = await addFakeUser(userCreate)
 
         const res = await Request(Server).post("/products")
         .send({
@@ -46,13 +45,12 @@ after(async function () {
             name:generateFakeProduct().name,
             price:generateFakeProduct().price})
         expect(res.status).to.equal(400)  
+        expect(res.text).to.equal("Not allowed")
     })
 
     it("Id required - POST/products", async function(){
         const userCreate = generateFakeUser()
-        const getToken = await Request(Server).post("/auth")
-        .auth(userCreate.username,userCreate.password)
-        const token = getToken.body.token
+        const token = await addFakeUser(userCreate)
 
         const res = await Request(Server).post("/products")
         .send({
@@ -61,13 +59,12 @@ after(async function () {
             price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400) 
+        expect(res.text).to.equal("Id required")
     })
 
     it("Price must be a number - POST/products", async function(){
         const userCreate = generateFakeUser()
-        const getToken = await Request(Server).post("/auth")
-        .auth(userCreate.username,userCreate.password)
-        const token = getToken.body.token
+        const token = await addFakeUser(userCreate)
 
         const res = await Request(Server).post("/products")
         .send({
@@ -75,14 +72,13 @@ after(async function () {
             name:generateFakeProduct().name,
             price:(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
-        expect(res.status).to.equal(400)  
+        expect(res.status).to.equal(400) 
+        expect(res.text).to.equal("Price must be number")
     })
 
     it("Name must be a string - POST/products", async function(){
         const userCreate = generateFakeUser()
-        const getToken = await Request(Server).post("/auth")
-        .auth(userCreate.username,userCreate.password)
-        const token = getToken.body.token
+        const token = await addFakeUser(userCreate)
 
         const res = await Request(Server).post("/products")
         .send({
@@ -91,13 +87,12 @@ after(async function () {
             price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400)  
+        expect(res.text).to.equal("Name must be string")
     })
 
     it("Name required - POST/products", async function(){
         const userCreate = generateFakeUser()
-        const getToken = await Request(Server).post("/auth")
-        .auth(userCreate.username,userCreate.password)
-        const token = getToken.body.token
+        const token = await addFakeUser(userCreate)
 
         const res = await Request(Server).post("/products")
         .send({
@@ -106,13 +101,12 @@ after(async function () {
             price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400)  
+        expect(res.text).to.equal("Name required")
     })
 
     it("Price required - POST/products", async function(){
         const userCreate = generateFakeUser()
-        const getToken = await Request(Server).post("/auth")
-        .auth(userCreate.username,userCreate.password)
-        const token = getToken.body.token
+        const token = await addFakeUser(userCreate)
 
         const res = await Request(Server).post("/products")
         .send({
@@ -121,6 +115,7 @@ after(async function () {
             price:''})
         .set('Authorization',`Bearer ${token}`)
         expect(res.status).to.equal(400) 
+        expect(res.text).to.equal("Price required")
     })
 
     it("Update product - POST/products/:id", async function(){
@@ -141,13 +136,16 @@ after(async function () {
         const fakeProduct = generateFakeProduct()
         const token = await addFakeUser(userCreate)
         const addMockProduct = await addFakeProduct(fakeProduct, token)
-
         const res = await Request(Server).patch(`/products/${addMockProduct._id}`)
         .send({
             name:generateFakeProduct().name,
             price:Number(generateFakeProduct().price)})
         .set('Authorization',`Bearer ${token}`)
-        expect(res.status).to.equal(200) 
+        
+        const productExists = await Products.exists({ id: fakeProduct.id })
+
+        expect(res.status).to.equal(200)
+        expect(productExists).to.be.true
     })
 
     
@@ -162,6 +160,8 @@ after(async function () {
             name:generateFakeProduct().name,
             price:Number(generateFakeProduct().price)})
         expect(res.status).to.equal(400) 
+        expect(res.text).to.equal("Not allowed")
+
     })
 
     it("Delete product - POST/products/:id", async function(){
@@ -172,7 +172,8 @@ after(async function () {
 
         const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
         .set('Authorization',`Bearer ${token}`)
-        expect(res.status).to.equal(400) 
+        expect(res.status).to.equal(200) 
+
     })
 
     it("Not the owner of the product - POST/products/:id", async function(){
@@ -188,6 +189,7 @@ after(async function () {
         const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
         .set('Authorization',`Bearer ${tokenMock}`)
         expect(res.status).to.equal(400) 
+        expect(res.text).to.equal("Not the owener of the product")
     })
 
     it("Unauthorized - POST/products/:id", async function(){
@@ -198,6 +200,7 @@ after(async function () {
 
         const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
         expect(res.status).to.equal(400) 
+        expect(res.text).to.equal("Not allowed")
     })
 
 })
