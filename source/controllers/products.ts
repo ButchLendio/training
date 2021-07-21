@@ -64,7 +64,9 @@ export const getAllProducts = async (ctx,next) => {
         const {first,last,after,before,sort,order} = ctx.request.query  
         console.log(first,last,after,before,sort,order)
         let convertedCurser,
-            totalProducts
+            totalProducts,
+            startCursor,
+            endCursor
 
         // const convertedCurser=Buffer.from(after || before, 'base64')
         // console.log(convertedCurser)
@@ -87,18 +89,28 @@ export const getAllProducts = async (ctx,next) => {
         }    
         
         if(last && before){
-            console.log("2")
             totalProducts = await Products.find()
+            
             convertedCurser=Buffer.from(before, 'base64')
-
-            console.log(convertedCurser)
             const products = await Products.find({
                 cursor:{
                     $lt:convertedCurser
                 }
-        }) 
-                    .skip(totalProducts.length-last)
-        console.log(products)
+            }).skip((totalProducts.length-1)-last)
+
+            console.log(products[0].id)
+            ctx.body={
+                products:{
+                    products
+                    },
+                pageInfo:{
+                    startCursor:'',
+                    endCursor:'',
+                    hasNextPage:hasNextPage,
+                    hasPreviousPage:!hasNextPage,
+                    totalCount:products.length
+                }
+                }
         }  
 
         // const totalProducts =  await Products.find()  

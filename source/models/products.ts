@@ -6,7 +6,7 @@ const ProductSchema: Schema = new Schema(
         id:{ type:String, required: true,unique:true },
         name: { type: String, required: true },
         price: { type: String, required: true },
-        createdBy:{type:String, required: true }
+        createdBy:{type:String, required: true },
     },
     {
         timestamps: true
