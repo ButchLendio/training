@@ -6,4 +6,6 @@ export default interface Products extends Document {
     price: string;
     createdBy: string;
     cursor: string;
+    createdAt:Date;
+    updatedAt:Date;
 }

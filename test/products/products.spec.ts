@@ -1,14 +1,16 @@
 import  Request  from 'supertest';
 import {expect} from 'chai'
 import Server from '../../source/server'
-import Products from '../../source/models/products'
+import R from 'ramda'
 import Users from "../../source/models/users"
+import Products from "../../source/models/products"
 import Bcryptjs from 'bcryptjs';
 import {
     generateFakeUser,
     generateFakeProduct,
     addFakeUser,
-    addFakeProduct} from '../helpers/helpers'
+    addFakeProduct,
+    populateProduct} from '../helpers/helpers'
 
 describe("Product Test",()=>{
 
@@ -205,6 +207,64 @@ after(async function () {
         const addMockProduct = await addFakeProduct(fakeProduct, token)
 
         const res = await Request(Server).delete(`/products/${addMockProduct._id}`)
+        expect(res.status).to.equal(400) 
+        expect(res.text).to.equal("Not allowed")
+    })
+
+    it("Get product in default - GET/products", async function(){
+        const userCreate = generateFakeUser()
+        const token = await addFakeUser(userCreate)
+
+        await populateProduct()
+
+        const res = await Request(Server).get(`/products`)
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+        expect(res.body.products.length).to.equal(res.body.pageInfo.totalCount)
+
+    })
+
+    it("Get product limit 3 - GET/products", async function(){
+        const userCreate = generateFakeUser()
+        const token = await addFakeUser(userCreate)
+
+        await populateProduct()
+
+        const res = await Request(Server).get(`/products?first=3`)
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+        expect(res.body.products.length).to.equal(res.body.pageInfo.totalCount)
+    })
+
+    it("Get product limit 3 and given cursor - GET/products", async function(){
+        const userCreate = generateFakeUser()
+        const token = await addFakeUser(userCreate)
+
+        await populateProduct()
+  
+        const foundCursor = await Request(Server).get(`/products?first=3`)
+        .set('Authorization',`Bearer ${token}`) 
+        const getCursor = foundCursor.body.products
+        const cursor = R.head(getCursor).cursor
+
+        const res = await Request(Server).get(`/products?first=3&after=${cursor}`)
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+        expect(res.body.products.length).to.equal(res.body.pageInfo.totalCount)
+    })
+
+    it("Unauthorized - GET/products", async function(){
+        const userCreate = generateFakeUser()
+        const token = await addFakeUser(userCreate)
+
+        await populateProduct()
+  
+        const foundCursor = await Request(Server).get(`/products?first=3`)
+        .set('Authorization',`Bearer ${token}`) 
+        const getCursor = foundCursor.body.products
+        const cursor = R.head(getCursor).cursor
+
+        const res = await Request(Server).get(`/products?first=3&after=${cursor}&sort=name`)
         expect(res.status).to.equal(400) 
         expect(res.text).to.equal("Not allowed")
     })

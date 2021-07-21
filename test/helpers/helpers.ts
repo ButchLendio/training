@@ -1,6 +1,9 @@
 import {internet,commerce,datatype} from "faker"
+import Products from '../../source/models/products';
 import  Request  from 'supertest';
 import server from '../../source/server'
+import R from 'ramda'
+
 
 
 export function generateFakeUser() {
@@ -41,4 +44,9 @@ export async function addFakeProduct(fakeProduct:{id:string,name:string,price:st
     .set('Authorization',`Bearer ${token}`)
 
     return(res.body.res)
+}
+
+export async function populateProduct() {
+    Products.create(R.times(() => generateFakeProduct())(20))
+     
 }
