@@ -214,8 +214,8 @@ after(async function () {
     it("Get product in default - GET/products", async function(){
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
-
-        await populateProduct()
+        const getUser = await Users.find()
+        await populateProduct(R.head(getUser).username)
 
         const res = await Request(Server).get(`/products`)
         .set('Authorization',`Bearer ${token}`)
@@ -227,8 +227,8 @@ after(async function () {
     it("Get product limit 3 - GET/products", async function(){
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
-
-        await populateProduct()
+        const getUser = await Users.find()
+        await populateProduct(R.head(getUser).username)
 
         const res = await Request(Server).get(`/products?first=3`)
         .set('Authorization',`Bearer ${token}`)
@@ -239,8 +239,8 @@ after(async function () {
     it("Get product limit 3 and given cursor - GET/products", async function(){
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
-
-        await populateProduct()
+        const getUser = await Users.find()
+        await populateProduct(R.head(getUser).username)
   
         const foundCursor = await Request(Server).get(`/products?first=3`)
         .set('Authorization',`Bearer ${token}`) 
@@ -253,12 +253,29 @@ after(async function () {
         expect(res.body.products.length).to.equal(res.body.pageInfo.totalCount)
     })
 
+    it("Get product limit 3 and given cursor and sort by name - GET/products", async function(){
+        const userCreate = generateFakeUser()
+        const token = await addFakeUser(userCreate)
+        const getUser = await Users.find()
+        await populateProduct(R.head(getUser).username)
+  
+        const foundCursor = await Request(Server).get(`/products?first=3`)
+        .set('Authorization',`Bearer ${token}`) 
+        const getCursor = foundCursor.body.products
+        const cursor = R.head(getCursor).cursor
+
+        const res = await Request(Server).get(`/products?first=3&after=${cursor}&sort=name`)
+        .set('Authorization',`Bearer ${token}`)
+        expect(res.status).to.equal(200) 
+        expect(res.body.products.length).to.equal(res.body.pageInfo.totalCount)
+    })
+
     it("Unauthorized - GET/products", async function(){
         const userCreate = generateFakeUser()
         const token = await addFakeUser(userCreate)
+        const getUser = await Users.find()
+        await populateProduct(R.head(getUser).username)
 
-        await populateProduct()
-  
         const foundCursor = await Request(Server).get(`/products?first=3`)
         .set('Authorization',`Bearer ${token}`) 
         const getCursor = foundCursor.body.products

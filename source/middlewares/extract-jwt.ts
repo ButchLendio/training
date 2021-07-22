@@ -24,11 +24,11 @@ export async function  verifyToken(
       ctx.throw(400,"Error")
     }else{
       ctx.userName=decoded.username
-      return next()
     }
     
   } catch (e) {
     ctx.throw(400, "Invalid token")
   } 
+  await next()
 }
 

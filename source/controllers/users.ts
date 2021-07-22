@@ -1,7 +1,9 @@
 import Bcryptjs from 'bcryptjs';
 import Users from '../models/users';
+import Products from '../models/products';
 import Config from '../configs/config';
 import Jwt from 'jsonwebtoken';
+import R,{ map } from 'ramda';
 
 import Auth from 'basic-auth';
 
@@ -84,4 +86,61 @@ export const login = async (ctx, next) => {
     } else {
         ctx.throw(401, 'Unauthorized');
     }
+};
+
+export const getAllProductsPerUser = async (ctx, next) => {
+    const { first, after, sort } = ctx.request.query;
+    const {userId} = ctx.params
+
+    let convertedCursor, startCursor, endCursor, hasNextPage, hasPreviousPage, sortFilter;
+
+    const foundDefault = await Products.find().limit( first ? +first : 5)
+    const foundUser = await Users.findById(userId)
+
+    if(!foundUser){
+        ctx.throw(400,"User not found")
+        return
+    }
+
+    const getCreatedBy=foundUser.username
+
+    convertedCursor = Buffer.from(after?after:R.head(foundDefault).cursor, 'base64');
+    hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
+    hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
+    sortFilter=(`${sort ? {sort : 1} : {"cursor": 1} }`)  
+    const products = await Products.find({
+        createdBy: getCreatedBy,
+        cursor: {
+            $gte: convertedCursor
+        }
+    })
+        .limit( first ? +first : 5)
+        .sort(sortFilter);
+
+        const returnables = map((product) =>
+            ({product:{   
+                    id: product._id,
+                    name:product.name,
+                    price: product.price,
+                    createdAt: product.createdAt,
+                    updatedAt: product.updatedAt, 
+                },
+                cursor:Buffer.from(product.cursor).toString('base64')
+            }),
+                products 
+            )
+
+    startCursor = Buffer.from(R.head(products).cursor, 'base64').toString('base64');
+    endCursor = Buffer.from(R.last(products).cursor, 'base64').toString('base64');
+
+    ctx.body = {
+        products: returnables,
+        pageInfo: {
+            startCursor,
+            endCursor,
+            hasNextPage,
+            hasPreviousPage,
+            totalCount: products.length
+        }
+    };
 };
