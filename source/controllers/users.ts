@@ -3,7 +3,7 @@ import Users from '../models/users';
 import Products from '../models/products';
 import Config from '../configs/config';
 import Jwt from 'jsonwebtoken';
-import R from 'ramda';
+import R,{ map } from 'ramda';
 
 import Auth from 'basic-auth';
 
@@ -94,17 +94,6 @@ export const getAllProductsPerUser = async (ctx, next) => {
 
     let convertedCursor, startCursor, endCursor, hasNextPage, hasPreviousPage, sortFilter;
 
-    const finalReturn: {
-        product: {
-            id: string;
-            name: string;
-            price: string;
-            createdAt: Date;
-            updatedAt: Date;
-        };
-        cursor: string;
-    }[] = [];
-
     const foundDefault = await Products.find().limit( first ? +first : 5)
     const foundUser = await Users.findById(userId)
 
@@ -118,7 +107,7 @@ export const getAllProductsPerUser = async (ctx, next) => {
     convertedCursor = Buffer.from(after?after:R.head(foundDefault).cursor, 'base64');
     hasNextPage = await Products.exists({ cursor: { $gt: convertedCursor } });
     hasPreviousPage = await Products.exists({ cursor: { $lt: convertedCursor } });
-    sortFilter=(`${sort ? {sort : 1} : {"name": 1} }`)  
+    sortFilter=(`${sort ? {sort : 1} : {"cursor": 1} }`)  
     const products = await Products.find({
         createdBy: getCreatedBy,
         cursor: {
@@ -128,32 +117,24 @@ export const getAllProductsPerUser = async (ctx, next) => {
         .limit( first ? +first : 5)
         .sort(sortFilter);
 
-    if(products.length===0){
-        ctx.throw(400,"There is no product created by this user")
-        return
-    }
-    
-
-    products.map((product) => {
-        const data = {
-            product: {
-                id: product._id,
-                name: product.name,
-                price: product.price,
-                createdAt: product.createdAt,
-                updatedAt: product.updatedAt
-            },
-            cursor: Buffer.from(product.cursor).toString('base64')
-        };
-        finalReturn.push(data);
-    });
-
+        const returnables = map((product) =>
+            ({product:{   
+                    id: product._id,
+                    name:product.name,
+                    price: product.price,
+                    createdAt: product.createdAt,
+                    updatedAt: product.updatedAt, 
+                },
+                cursor:Buffer.from(product.cursor).toString('base64')
+            }),
+                products 
+            )
 
     startCursor = Buffer.from(R.head(products).cursor, 'base64').toString('base64');
     endCursor = Buffer.from(R.last(products).cursor, 'base64').toString('base64');
 
     ctx.body = {
-        products: finalReturn,
+        products: returnables,
         pageInfo: {
             startCursor,
             endCursor,
