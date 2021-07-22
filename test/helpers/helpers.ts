@@ -22,6 +22,20 @@ export function generateFakeProduct() {
     }
 }
 
+export function generateFakeProductToAdd(username) {
+    const createdAt = new Date();
+    const cursor = Buffer.concat([Buffer.from(`${createdAt.getTime()}`), Buffer.from(datatype.uuid())]);
+    const createdBy = username
+    
+    return {
+        id:datatype.uuid(),
+        name: commerce.product(),
+        price: commerce.price(),
+        createdBy,
+        cursor
+    }
+}
+
 export async function addFakeUser(fakeUser:{name:string,username:string,password:string}) {
      await Request(server).post("/users")
     .send({name:fakeUser.name})
@@ -46,7 +60,6 @@ export async function addFakeProduct(fakeProduct:{id:string,name:string,price:st
     return(res.body.res)
 }
 
-export async function populateProduct() {
-    Products.create(R.times(() => generateFakeProduct())(20))
-     
+export async function populateProduct(info) {
+    await Products.create(R.times(() => generateFakeProductToAdd(info))(10)) 
 }
